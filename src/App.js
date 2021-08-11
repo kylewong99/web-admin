@@ -13,6 +13,9 @@ function App() {
   const [passwordError, setPasswordError] = useState("");
   const [hasAccount, setHasAccount] = useState(false);
 
+  // Get user collection from database
+  const ref = firebase.firestore().collection("admin");
+
   const clearInputs = () => {
     setEmail("");
     setPassword("");
@@ -23,8 +26,23 @@ function App() {
     setPasswordError("");
   };
 
-  const handleLogin = () => {
+  const checkAdminStatus = () => {
     clearErrors();
+    const admins = [];
+    ref.where("email", "==", email).onSnapshot((querySnapShot) => {
+      querySnapShot.forEach((admin) => {
+        admins.push(admin.data());
+      });
+      console.log(admins.length);
+      if (admins.length > 0) {
+        handleLogin();
+      } else {
+        setPasswordError("The email or password is invalid.");
+      }
+    });
+  };
+
+  const handleLogin = () => {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
@@ -69,14 +87,14 @@ function App() {
   return (
     <>
       {user ? (
-        <Index handleLogout={handleLogout}/>
+        <Index handleLogout={handleLogout} />
       ) : (
         <Login
           email={email}
           setEmail={setEmail}
           password={password}
           setPassword={setPassword}
-          handleLogin={handleLogin}
+          checkAdminStatus={checkAdminStatus}
           hasAccount={hasAccount}
           setHasAccount={setHasAccount}
           emailError={emailError}

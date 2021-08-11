@@ -8,7 +8,7 @@ const Login = (props) => {
     setEmail,
     password,
     setPassword,
-    handleLogin,
+    checkAdminStatus,
     hasAccount,
     setHasAccount,
     emailError,
@@ -51,7 +51,7 @@ const Login = (props) => {
               </div>
               <p>{passwordError}</p>
             </div>
-            <button onClick={handleLogin}>Submit</button>
+            <button onClick={checkAdminStatus}>Submit</button>
           </div>
         </div>
       </div>
