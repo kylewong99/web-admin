@@ -1,0 +1,11 @@
+.sidebar-container {
+    background-color:yellow;
+    height:100%;
+    width:20%;
+    position:fixed;
+    padding-left:10px;
+}
+
+#title{
+    text-align:center;
+}
