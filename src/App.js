@@ -11,9 +11,8 @@ function App() {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [hasAccount, setHasAccount] = useState(false);
 
-  // Get user collection from database
+  // Get admin collection from database
   const ref = firebase.firestore().collection("admin");
 
   const clearInputs = () => {
@@ -95,8 +94,6 @@ function App() {
           password={password}
           setPassword={setPassword}
           checkAdminStatus={checkAdminStatus}
-          hasAccount={hasAccount}
-          setHasAccount={setHasAccount}
           emailError={emailError}
           passwordError={passwordError}
         />
