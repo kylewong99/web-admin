@@ -1,6 +1,5 @@
 import React from "react";
 import "./Login.css";
-import firebase from "../firebase";
 
 const Login = (props) => {
   const {

@@ -1,87 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
-import firebase from "../firebase";
 import { v4 as uuidv4 } from "uuid";
 import "./Admin.css";
 import { Button, Modal } from "react-bootstrap";
 import AdminPopupAdd from "./AdminPopupAdd";
+import AdminPopupDelete from "./AdminPopupDelete";
+import * as admin from "firebase-admin";
+import firebase from "firebase/app";
+import axios from "axios";
 
-export default function Content() {
+const Admin = () => {
   const [admins, setAdmins] = useState([]);
-  const [modalShow, setModalShow] = useState();
+  const [modalAddShow, setModalAddShow] = useState();
+  const [modalDeleteShow, setModalDeleteShow] = useState();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [pageNumber, setPageNumber] = useState(0);
 
-  // Get admin collection from database
   const ref = firebase.firestore().collection("admin");
 
-  const AdminPopupAdds = () => {
-    return (
-      <Modal
-        show={modalShow}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Add New Admin
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <div class="form-group row mb-3">
-              <label for="staticEmail" class="col-sm-3 col-form-label">
-                Email
-              </label>
-              <div class="col-sm-9">
-                <input
-                  type="text"
-                  class="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-            <div class="form-group row mb-3">
-              <label for="inputPassword" class="col-sm-3 col-form-label">
-                Password
-              </label>
-              <div class="col-sm-9">
-                <input
-                  type="password"
-                  class="form-control"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="inputPassword" class="col-sm-3 col-form-label">
-                Confirm Password
-              </label>
-              <div class="col-sm-9">
-                <input
-                  type="password"
-                  class="form-control"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </div>
-            </div>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={() => addAdmin({ email, id: uuidv4() })}>Add</Button>
-          <Button variant="danger" onClick={() => setModalShow(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
+  let counter = 0;
+
+  const testServer = () => {
+    axios
+      .get("/deleteAdmin", {
+        params: {
+          email: "bar",
+        },
+      })
+      .then(function (response) {
+        console.log(response.data);
+      });
   };
 
   const clearErrors = () => {
@@ -107,49 +59,80 @@ export default function Content() {
   };
 
   // ADD FUNCTION
+  // const addAdmin = () => {
+  //   const newAdmin = { email, id: uuidv4() };
+  //   clearErrors();
+  //   if (confirmPassword.length == password.length) {
+  //     firebase
+  //       .auth()
+  //       .createUserWithEmailAndPassword(email, password)
+  //       .then(() => {
+  //         ref
+  //           .doc(newAdmin.id)
+  //           .set(newAdmin)
+  //           .then(() => {
+  //             clearInputs();
+  //           })
+  //           .catch((err) => {
+  //             console.error(err);
+  //           });
+  //       })
+  //       .catch((err) => {
+  //         switch (err.code) {
+  //           case "auth/email-already-in-use":
+  //           case "auth/invalid-email":
+  //             setEmailError(err.message);
+  //             break;
+  //           case "auth/weak-password":
+  //             setPasswordError(err.message);
+  //             break;
+  //         }
+  //       });
+  //   } else {
+  //     setConfirmPasswordError("Invalid confirm password.");
+  //   }
+  // };
+
   const addAdmin = () => {
     const newAdmin = { email, id: uuidv4() };
-    clearErrors();
     if (confirmPassword.length == password.length) {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          ref
-            .doc(newAdmin.id)
-            .set(newAdmin)
-            .then(() => {
-              clearInputs();
-            })
-            .catch((err) => {
-              console.error(err);
-            });
+      axios
+        .get("/addAdmin", {
+          params: {
+            email: email,
+            password: password,
+          },
         })
-        .catch((err) => {
-          switch (err.code) {
-            case "auth/email-already-in-use":
-            case "auth/invalid-email":
-              setEmailError(err.message);
-              break;
-            case "auth/weak-password":
-              setPasswordError(err.message);
-              break;
+        .then(function (response) {
+          console.log(response.data);
+          if (response.data == "success") {
+            ref
+              .doc(newAdmin.id)
+              .set(newAdmin)
+              .catch((err) => {
+                console.log(err);
+              });
           }
         });
-    } else {
-      setConfirmPasswordError("Invalid confirm password.");
     }
   };
 
-  // DELETE FUNCTION
-  function deleteUser(user) {
+  const deleteAdmin = (admin) => {
+    axios
+      .get("/deleteAdmin", {
+        params: {
+          email: admin.adminEmail,
+        },
+      })
+      .then(function (response) {});
     ref
-      .doc(user.id)
+      .doc(admin.id)
       .delete()
       .catch((err) => {
         console.error(err);
       });
-  }
+    setModalDeleteShow(false);
+  };
 
   useEffect(() => {
     getAdmin();
@@ -157,13 +140,13 @@ export default function Content() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setModalShow(true)}>
+      <Button variant="primary" onClick={() => setModalAddShow(true)}>
         Add New
       </Button>
 
       <AdminPopupAdd
-        show={modalShow}
-        onHide={() => setModalShow(false)}
+        show={modalAddShow}
+        onHide={() => setModalAddShow(false)}
         email={email}
         password={password}
         confirmPassword={confirmPassword}
@@ -171,14 +154,53 @@ export default function Content() {
         setPassword={setPassword}
         setConfirmPassword={setConfirmPassword}
         addAdmin={addAdmin}
+        emailError={emailError}
+        passwordError={passwordError}
+        confirmPasswordError={confirmPasswordError}
       />
 
-      {admins.map((admin) => (
-        <div key={admin.id}>
-          <h2>{admin.email}</h2>
-          {/* <button onClick={() => deleteUser(user)}>X</button> */}
-        </div>
-      ))}
+      <AdminPopupDelete
+        show={modalDeleteShow}
+        onHide={() => setModalDeleteShow(false)}
+        deleteAdmin={deleteAdmin}
+      />
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Email</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {admins.slice(pageNumber, pageNumber + 10).map((admin) => {
+            counter += 1;
+            return (
+              <>
+                <tr key={admin.id}>
+                  <p>{admins.length}</p>
+                  <td>{counter}</td>
+                  <td>{admin.email}</td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        setModalDeleteShow(true);
+                        localStorage.setItem("deleteEmail", admin.email);
+                        localStorage.setItem("deleteAdminId", admin.id);
+                      }}
+                    >
+                      X
+                    </Button>
+                  </td>
+                </tr>
+              </>
+            );
+          })}
+        </tbody>
+      </table>
     </>
   );
-}
+};
+
+export default Admin;

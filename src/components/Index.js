@@ -1,50 +1,25 @@
 import React, { useState, useEffect } from "react";
 import "./Index.css";
-import firebase from "../firebase";
 import Admin from "./Admin";
 import User from "./User";
 
 const Index = (props) => {
   const [selectedPage, setSelectedPage] = useState("admin");
 
-  const email = firebase.auth().currentUser.email;
-
   const { handleLogout } = props;
+
+  const userEmail = localStorage.getItem("email");
 
   const setPage = (page) => {
     setSelectedPage(page);
   };
 
   const test = () => {
-    console.log("clicked");
+    console.log(userEmail);
   };
 
   return (
     <>
-      {/* <h1>{selectedPage}</h1>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col">
-            <h1>Go Green</h1>
-          </div>
-        </div>
-      </div>
-      <div style={{ float: "left" }}>
-        <Sidebar setPage={setPage} handleLogout={handleLogout} />
-      </div>
-      <div style={{ float: "right" }}>
-        {(() => {
-          switch (selectedPage) {
-            case ('admin'):
-              return <Admin />
-            case ('user'):
-              return <User />
-            default:
-              return <Admin />
-          }
-        })()}
-      </div> */}
-
       <div class="container-fluid">
         <div class="row flex-nowrap">
           <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
@@ -61,7 +36,10 @@ const Index = (props) => {
                 <li class="nav-item">
                   <div id="sidebar-content" class="nav-link align-middle px-0">
                     <i class="fs-4 bi-house"></i>{" "}
-                    <span onClick={() => setPage("admin")} class="ms-1 d-none d-sm-inline">
+                    <span
+                      onClick={() => setPage("admin")}
+                      class="ms-1 d-none d-sm-inline"
+                    >
                       Admin
                     </span>
                   </div>
@@ -69,7 +47,10 @@ const Index = (props) => {
                 <li class="nav-item">
                   <div id="sidebar-content" class="nav-link align-middle px-0">
                     <i class="fs-4 bi-house"></i>{" "}
-                    <span onClick={() => setPage("user")} class="ms-1 d-none d-sm-inline">
+                    <span
+                      onClick={() => setPage("user")}
+                      class="ms-1 d-none d-sm-inline"
+                    >
                       User
                     </span>
                   </div>
@@ -93,7 +74,10 @@ const Index = (props) => {
                 <li class="nav-item">
                   <div id="sidebar-content" class="nav-link align-middle px-0">
                     <i class="fs-4 bi-house"></i>{" "}
-                    <span onClick={handleLogout} class="ms-1 d-none d-sm-inline">
+                    <span
+                      onClick={handleLogout}
+                      class="ms-1 d-none d-sm-inline"
+                    >
                       Logout
                     </span>
                   </div>
@@ -101,12 +85,9 @@ const Index = (props) => {
               </ul>
               <hr />
               <div class="pb-4">
-                <div
-                  href="#"
-                  class="d-flex align-items-center text-white text-decoration-none text-wrap"
-                >
-                  <span class="">
-                    <h2>Welcome,</h2> {email}
+                <div class="d-flex align-items-center text-white text-decoration-none text-wrap mb-2">
+                  <span>
+                    <h2>Welcome,</h2> {userEmail}
                   </span>
                 </div>
               </div>

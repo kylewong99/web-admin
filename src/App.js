@@ -3,7 +3,12 @@ import logo from "./logo.svg";
 import "./App.css";
 import Index from "./components/Index";
 import Login from "./components/Login";
-import firebase from "./firebase";
+// import firebase from "./firebase";
+import firebase from "firebase/app";
+import "firebase/firestore";
+import "firebase/auth";
+
+import axios from "axios";
 
 function App() {
   const [user, setUser] = useState("");
@@ -11,6 +16,30 @@ function App() {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDT6zycBbllbLqRt1ZfcwjAjaxbRR6qq0w",
+    authDomain: "go-green-3620b.firebaseapp.com",
+    projectId: "go-green-3620b",
+    storageBucket: "go-green-3620b.appspot.com",
+    messagingSenderId: "793344993579",
+    appId: "1:793344993579:web:cdc05c8917ee1f7a73fd6e",
+  };
+
+  if (!firebase.apps.length) {
+    console.log("oh my gosssd");
+    firebase.initializeApp(firebaseConfig);
+  } else {
+    firebase.app();
+  }
+
+  const testServer = () => {
+    axios.get("/test", {params: {
+      foo: 'bar'
+    }}).then(function (response) {
+      console.log(response.data);
+    });
+  };
 
   // Get admin collection from database
   const ref = firebase.firestore().collection("admin");
@@ -45,6 +74,9 @@ function App() {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        localStorage.setItem("email", email);
+      })
       .catch((err) => {
         console.log(err.code);
         switch (err.code) {
@@ -65,13 +97,13 @@ function App() {
 
   const handleLogout = () => {
     firebase.auth().signOut();
-    console.log("Logout");
+    clearInputs();
+    console.log("Logoutss");
   };
 
   const authListener = () => {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        clearInputs();
         setUser(user);
       } else {
         setUser("");
