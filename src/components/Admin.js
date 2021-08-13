@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./Admin.css";
-import { Button, Modal } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import AdminPopupAdd from "./AdminPopupAdd";
 import AdminPopupDelete from "./AdminPopupDelete";
-import * as admin from "firebase-admin";
 import firebase from "firebase/app";
 import axios from "axios";
+import ReactPaginate from "react-paginate";
 
 const Admin = () => {
   const [admins, setAdmins] = useState([]);
@@ -20,21 +20,17 @@ const Admin = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
 
+  const adminsPerPage = 10;
+  const pageVisited = pageNumber * adminsPerPage;
+
+  const pageCount = Math.ceil(admins.length / adminsPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
   const ref = firebase.firestore().collection("admin");
 
   let counter = 0;
-
-  const testServer = () => {
-    axios
-      .get("/deleteAdmin", {
-        params: {
-          email: "bar",
-        },
-      })
-      .then(function (response) {
-        console.log(response.data);
-      });
-  };
 
   const clearErrors = () => {
     setEmailError("");
@@ -59,42 +55,9 @@ const Admin = () => {
   };
 
   // ADD FUNCTION
-  // const addAdmin = () => {
-  //   const newAdmin = { email, id: uuidv4() };
-  //   clearErrors();
-  //   if (confirmPassword.length == password.length) {
-  //     firebase
-  //       .auth()
-  //       .createUserWithEmailAndPassword(email, password)
-  //       .then(() => {
-  //         ref
-  //           .doc(newAdmin.id)
-  //           .set(newAdmin)
-  //           .then(() => {
-  //             clearInputs();
-  //           })
-  //           .catch((err) => {
-  //             console.error(err);
-  //           });
-  //       })
-  //       .catch((err) => {
-  //         switch (err.code) {
-  //           case "auth/email-already-in-use":
-  //           case "auth/invalid-email":
-  //             setEmailError(err.message);
-  //             break;
-  //           case "auth/weak-password":
-  //             setPasswordError(err.message);
-  //             break;
-  //         }
-  //       });
-  //   } else {
-  //     setConfirmPasswordError("Invalid confirm password.");
-  //   }
-  // };
-
   const addAdmin = () => {
     const newAdmin = { email, id: uuidv4() };
+    clearErrors();
     if (confirmPassword.length == password.length) {
       axios
         .get("/addAdmin", {
@@ -106,14 +69,31 @@ const Admin = () => {
         .then(function (response) {
           console.log(response.data);
           if (response.data == "success") {
+            clearInputs();
             ref
               .doc(newAdmin.id)
               .set(newAdmin)
               .catch((err) => {
                 console.log(err);
               });
+          } else if (
+            response.data ==
+            "The email address is already in use by another account."
+          ) {
+            setEmailError(response.data);
+          } else if (
+            response.data == "The email address is improperly formatted."
+          ) {
+            setEmailError(response.data);
+          } else if (
+            response.data ==
+            "The password must be a string with at least 6 characters."
+          ) {
+            setPasswordError(response.data);
           }
         });
+    } else {
+      setConfirmPasswordError("Confirm password and password is not matched.");
     }
   };
 
@@ -124,13 +104,20 @@ const Admin = () => {
           email: admin.adminEmail,
         },
       })
-      .then(function (response) {});
-    ref
-      .doc(admin.id)
-      .delete()
-      .catch((err) => {
-        console.error(err);
+      .then(function (response) {
+        ref
+          .doc(admin.id)
+          .delete()
+          .catch((err) => {
+            console.error(err);
+          });
+        if (
+          admins.slice(pageVisited, pageVisited + adminsPerPage).length <= 1
+        ) {
+          setPageNumber((previousPage) => previousPage - 1);
+        }
       });
+
     setModalDeleteShow(false);
   };
 
@@ -173,32 +160,45 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-          {admins.slice(pageNumber, pageNumber + 10).map((admin) => {
-            counter += 1;
-            return (
-              <>
-                <tr key={admin.id}>
-                  <p>{admins.length}</p>
-                  <td>{counter}</td>
-                  <td>{admin.email}</td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      onClick={() => {
-                        setModalDeleteShow(true);
-                        localStorage.setItem("deleteEmail", admin.email);
-                        localStorage.setItem("deleteAdminId", admin.id);
-                      }}
-                    >
-                      X
-                    </Button>
-                  </td>
-                </tr>
-              </>
-            );
-          })}
+          {admins
+            .slice(pageVisited, pageVisited + adminsPerPage)
+            .map((admin) => {
+              counter += 1;
+              return (
+                <>
+                  <tr key={admin.id}>
+                    <td>{counter}</td>
+                    <td>{admin.email}</td>
+                    <td>
+                      <Button
+                        variant="danger"
+                        onClick={() => {
+                          setModalDeleteShow(true);
+                          localStorage.setItem("deleteEmail", admin.email);
+                          localStorage.setItem("deleteAdminId", admin.id);
+                        }}
+                      >
+                        X
+                      </Button>
+                    </td>
+                  </tr>
+                </>
+              );
+            })}
         </tbody>
       </table>
+      <ReactPaginate
+        previousLabel={"Previous"}
+        nextLabel={"Next"}
+        pageCount={pageCount}
+        onPageChange={changePage}
+        forcePage={pageNumber}
+        containerClassName={"paginationBttns"}
+        previousLinkClassName={"previousBttn"}
+        nextLinkClassName={"nextBttn"}
+        disabledClassName={"paginationDisabled"}
+        activeClassName={"paginationActive"}
+      />
     </>
   );
 };

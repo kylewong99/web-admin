@@ -23,7 +23,7 @@ const Login = (props) => {
               height="250"
               class="img-center"
             />
-            <h1 id="title">Go Green</h1>
+            <h1 class="mx-auto">Go Green</h1>
             <form>
               <div class="form-group row mb-3 ms-3 me-3">
                 <label for="staticEmail" class="col-sm-3 col-form-label">
@@ -43,7 +43,7 @@ const Login = (props) => {
               </div>
               {emailError.length > 0 && (
                 <div class="form-group row mb-3 ms-3 me-3">
-                  <div class="col-sm-12">{emailError}</div>
+                  <div style={{color:"red"}} class="col-sm-12">{emailError}</div>
                 </div>
               )}
               <div class="form-group row mb-3 ms-3 me-3">
@@ -63,7 +63,7 @@ const Login = (props) => {
               </div>
               {passwordError.length > 0 && (
                 <div class="form-group row mb-3 ms-3 me-3">
-                  <div class="col-sm-12">{passwordError}</div>
+                  <div style={{color:"red"}} class="col-sm-12">{passwordError}</div>
                 </div>
               )}
               <div class="form-group row mb-3 ms-4 me-4">

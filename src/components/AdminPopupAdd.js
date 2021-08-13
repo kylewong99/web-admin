@@ -1,6 +1,5 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { v4 as uuidv4 } from "uuid";
 
 const AdminPopupAdd = (props) => {
   const {

@@ -67,7 +67,7 @@ const Index = (props) => {
                   <div id="sidebar-content" class="nav-link align-middle px-0">
                     <i class="fs-4 bi-house"></i>{" "}
                     <span onClick={test} class="ms-1 d-none d-sm-inline">
-                      Tutorial
+                      Quizes
                     </span>
                   </div>
                 </li>

@@ -73,9 +73,11 @@ app.get("/deleteAdmin", function (req, res) {
         .deleteUser(uid)
         .then(() => {
           console.log("Successfully deleted user");
+          res.send("Successfully deleted user");
         })
         .catch((error) => {
           console.log("Error deleting user:", error);
+          res.send("Error deleting user.");
         });
     })
     .catch((error) => {
@@ -91,14 +93,26 @@ app.get("/addAdmin", function (req, res) {
     .auth()
     .createUser({
       email: email,
-      password: password
+      password: password,
     })
     .then((userRecord) => {
       // See the UserRecord reference doc for the contents of userRecord.
-      console.log("Successfully created new user:", userRecord.uid);
+      console.log("Successfully created new user:", userRecord);
       res.send("success");
     })
     .catch((error) => {
+      console.log(error.code);
+      switch (error.code) {
+        case "auth/email-already-exists":
+          res.send("The email address is already in use by another account.");
+          break;
+        case "auth/invalid-email":
+          res.send("The email address is improperly formatted.");
+          break;
+        case "auth/invalid-password":
+          res.send("The password must be a string with at least 6 characters.");
+          break;
+      }
       console.log("Error creating new user:", error);
     });
 });

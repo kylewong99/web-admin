@@ -26,7 +26,6 @@ const AdminPopupDelete = (props) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <p>{adminId}</p>
           <p>Are you sure you want to delete {email}</p>
         </Modal.Body>
         <Modal.Footer>
