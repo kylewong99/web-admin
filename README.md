@@ -6,6 +6,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+### `node server/index.js`
+
+Run the app in the server.\
+Open [http://localhost:8080](http://localhostz:8080) to view it in the browser.
+
 ### `npm start`
 
 Runs the app in the development mode.\
