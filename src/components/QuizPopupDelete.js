@@ -16,7 +16,7 @@ const QuizPopupDelete = (props) => {
       >
         <Modal.Header>
           <Modal.Title id="contained-modal-title-vcenter">
-            Delete Admin
+            Delete Question
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

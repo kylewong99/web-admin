@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Form } from "react-bootstrap";
 import QuizPopupDelete from "./QuizPopupDelete";
+import QuizPopupEdit from "./QuizPopupEdit";
 
 const Quiz = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -13,6 +14,15 @@ const Quiz = () => {
   const [modalEditShow, setModalEditShow] = useState();
   const [titles, setTitles] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("quiz1");
+
+  // To show the questions details in the edit page
+  const [question, setQuestion] = useState();
+  const [optionA, setOptionA] = useState();
+  const [optionB, setOptionB] = useState();
+  const [optionC, setOptionC] = useState();
+  const [optionD, setOptionD] = useState();
+  const [answer, setAnswer] = useState();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const ref = firebase.firestore().collection("quizzes");
 
@@ -26,6 +36,7 @@ const Quiz = () => {
 
   let counter = 0;
 
+  // Get title of all quizzes
   const getTitle = () => {
     ref.onSnapshot((querySnapShot) => {
       const title = [];
@@ -36,10 +47,10 @@ const Quiz = () => {
       setTitles(title);
       console.log(selectedTitle);
     });
-  }
+  };
 
+  // Get all questions from the selected quiz
   const getQuiz = () => {
-    
     ref
       .doc(selectedTitle)
       .collection("questions")
@@ -70,6 +81,20 @@ const Quiz = () => {
       });
   };
 
+  const isEmpty = () => {};
+
+  const editQuestion = (updatedQuestion) => {
+
+    ref
+      .doc(selectedTitle)
+      .collection("questions")
+      .doc(updatedQuestion.id)
+      .set(updatedQuestion)
+      .then(() => {
+        setModalEditShow(false);
+      });
+  };
+
   useEffect(() => {
     getTitle();
     getQuiz();
@@ -81,6 +106,25 @@ const Quiz = () => {
         show={modalDeleteShow}
         onHide={() => setModalDeleteShow(false)}
         deleteQuestion={() => deleteQuestion()}
+      />
+      <QuizPopupEdit
+        show={modalEditShow}
+        onHide={() => setModalEditShow(false)}
+        question={question}
+        optionA={optionA}
+        optionB={optionB}
+        optionC={optionC}
+        optionD={optionD}
+        answer={answer}
+        errorMessage={errorMessage}
+        setQuestion={setQuestion}
+        setOptionA={setOptionA}
+        setOptionB={setOptionB}
+        setOptionC={setOptionC}
+        setOptionD={setOptionD}
+        setAnswer={setAnswer}
+        setErrorMessage={setErrorMessage}
+        editQuestion={editQuestion}
       />
       <Form.Group controlId="formBasicSelect">
         <Form.Label>
@@ -95,11 +139,7 @@ const Quiz = () => {
           }}
         >
           {titles.map((title) => {
-            return (
-              <option value={title.id}>
-                {title.title}
-              </option>
-            );
+            return <option value={title.id}>{title.title}</option>;
           })}
         </Form.Control>
       </Form.Group>
@@ -132,7 +172,30 @@ const Quiz = () => {
                     <td>{quiz.optionD}</td>
                     <td>{quiz.answer}</td>
                     <td>
-                      <Button className="me-2">Edit</Button>
+                      <Button
+                        className="me-2"
+                        onClick={() => {
+                          ref
+                            .doc(selectedTitle)
+                            .collection("questions")
+                            .doc(quiz.id)
+                            .get()
+                            .then((quiz) => {
+                              setQuestion(quiz.data().question);
+                              setOptionA(quiz.data().optionA);
+                              setOptionB(quiz.data().optionB);
+                              setOptionC(quiz.data().optionC);
+                              setOptionD(quiz.data().optionD);
+                              setAnswer(quiz.data().answer);
+                            })
+                            .then(() => {
+                              setModalEditShow(true);
+                              localStorage.setItem("docID", quiz.id);
+                            });
+                        }}
+                      >
+                        Edit
+                      </Button>
                       <Button
                         variant="danger"
                         onClick={() => {
