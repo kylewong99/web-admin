@@ -6,12 +6,14 @@ import ReactPaginate from "react-paginate";
 import { Form } from "react-bootstrap";
 import QuizPopupDelete from "./QuizPopupDelete";
 import QuizPopupEdit from "./QuizPopupEdit";
+import QuizPopupAdd from "./QuizPopupAdd";
 
 const Quiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [modalDeleteShow, setModalDeleteShow] = useState();
   const [modalEditShow, setModalEditShow] = useState();
+  const [modalAddShow, setModalAddShow] = useState();
   const [titles, setTitles] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("quiz1");
 
@@ -21,7 +23,7 @@ const Quiz = () => {
   const [optionB, setOptionB] = useState();
   const [optionC, setOptionC] = useState();
   const [optionD, setOptionD] = useState();
-  const [answer, setAnswer] = useState();
+  const [answer, setAnswer] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const ref = firebase.firestore().collection("quizzes");
@@ -63,6 +65,15 @@ const Quiz = () => {
       });
   };
 
+  const clearInputs = () => {
+    setAnswer("");
+    setOptionA("");
+    setOptionB("");
+    setOptionC("");
+    setOptionD("");
+    setQuestion("");
+  };
+
   const deleteQuestion = () => {
     var docID = localStorage.getItem("docID");
 
@@ -81,10 +92,7 @@ const Quiz = () => {
       });
   };
 
-  const isEmpty = () => {};
-
   const editQuestion = (updatedQuestion) => {
-
     ref
       .doc(selectedTitle)
       .collection("questions")
@@ -92,6 +100,25 @@ const Quiz = () => {
       .set(updatedQuestion)
       .then(() => {
         setModalEditShow(false);
+        clearInputs();
+      });
+  };
+
+  const addQuestion = (question) => {
+    if (question.answer.trim().length == 0) {
+      question.answer = question.optionA;
+    }
+    ref
+      .doc(selectedTitle)
+      .collection("questions")
+      .doc(question.id)
+      .set(question)
+      .then(() => {
+        setModalAddShow(false);
+        clearInputs();
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -102,6 +129,29 @@ const Quiz = () => {
 
   return (
     <>
+      <QuizPopupAdd
+        show={modalAddShow}
+        onHide={() => {
+          setModalAddShow(false);
+          clearInputs();
+        }}
+        question={question}
+        optionA={optionA}
+        optionB={optionB}
+        optionC={optionC}
+        optionD={optionD}
+        answer={answer}
+        errorMessage={errorMessage}
+        setQuestion={setQuestion}
+        setOptionA={setOptionA}
+        setOptionB={setOptionB}
+        setOptionC={setOptionC}
+        setOptionD={setOptionD}
+        setAnswer={setAnswer}
+        setErrorMessage={setErrorMessage}
+        addQuestion={addQuestion}
+      />
+
       <QuizPopupDelete
         show={modalDeleteShow}
         onHide={() => setModalDeleteShow(false)}
@@ -109,7 +159,10 @@ const Quiz = () => {
       />
       <QuizPopupEdit
         show={modalEditShow}
-        onHide={() => setModalEditShow(false)}
+        onHide={() => {
+          setModalEditShow(false);
+          clearInputs();
+        }}
         question={question}
         optionA={optionA}
         optionB={optionB}
@@ -126,6 +179,17 @@ const Quiz = () => {
         setErrorMessage={setErrorMessage}
         editQuestion={editQuestion}
       />
+
+      <Button
+        className="mb-2"
+        variant="primary"
+        onClick={() => {
+          setModalAddShow(true);        
+        }}
+      >
+        Add New
+      </Button>
+
       <Form.Group controlId="formBasicSelect">
         <Form.Label>
           <b>Select Quizzes Chapter</b>

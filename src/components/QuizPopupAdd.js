@@ -1,7 +1,8 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
+import { v4 as uuidv4 } from "uuid";
 
-const QuizPopupEdit = (props) => {
+const QuizPopupAdd = (props) => {
   const {
     show,
     onHide,
@@ -19,10 +20,8 @@ const QuizPopupEdit = (props) => {
     setOptionD,
     setAnswer,
     setErrorMessage,
-    editQuestion,
+    addQuestion,
   } = props;
-
-  var docID = localStorage.getItem("docID");
 
   const isEmpty = () => {
     if (
@@ -35,9 +34,12 @@ const QuizPopupEdit = (props) => {
       setErrorMessage("Please make sure there are no empty fields.");
     } else {
       setErrorMessage("");
-      editQuestion({
+      if (answer.trim().length == 0) {
+        setAnswer(optionA);
+      }
+      addQuestion({
         answer: answer,
-        id: docID,
+        id: uuidv4(),
         optionA: optionA,
         optionB: optionB,
         optionC: optionC,
@@ -57,7 +59,7 @@ const QuizPopupEdit = (props) => {
       >
         <Modal.Header>
           <Modal.Title id="contained-modal-title-vcenter">
-            Edit Question
+            Add Question
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -142,10 +144,10 @@ const QuizPopupEdit = (props) => {
                         setAnswer(e.target.value);
                       }}
                     >
-                      <option value={optionA}>{optionA}</option>
-                      <option value={optionB}>{optionB}</option>
-                      <option value={optionC}>{optionC}</option>
-                      <option value={optionD}>{optionD}</option>
+                      <option value={optionA}>Option A</option>
+                      <option value={optionB}>Option B</option>
+                      <option value={optionC}>Option C</option>
+                      <option value={optionD}>Option D</option>
                     </select>
                   </div>
                 </form>
@@ -161,14 +163,14 @@ const QuizPopupEdit = (props) => {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => isEmpty()}>Edit</Button>
-          <Button variant="danger" onClick={onHide}>
-            Close
+          <Button onClick={() => isEmpty()}>
+            Add
           </Button>
+          <Button variant="danger" onClick={onHide}>Close</Button>
         </Modal.Footer>
       </Modal>
     </div>
   );
 };
 
-export default QuizPopupEdit;
+export default QuizPopupAdd;
