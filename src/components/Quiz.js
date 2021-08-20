@@ -4,13 +4,15 @@ import "./Quiz.css";
 import { Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Form } from "react-bootstrap";
+import QuizPopupDelete from "./QuizPopupDelete";
 
 const Quiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [modalDeleteShow, setModalDeleteShow] = useState();
+  const [modalEditShow, setModalEditShow] = useState();
   const [titles, setTitles] = useState([]);
-  const [selectedTitle, setSelectedTitle] = useState();
+  const [selectedTitle, setSelectedTitle] = useState("quiz1");
 
   const ref = firebase.firestore().collection("quizzes");
 
@@ -24,50 +26,66 @@ const Quiz = () => {
 
   let counter = 0;
 
-  const getQuizTitle = () => {
+  const getTitle = () => {
     ref.onSnapshot((querySnapShot) => {
       const title = [];
+      console.log(titles.length < 1);
       querySnapShot.forEach((quizTitle) => {
         title.push(quizTitle.data());
       });
       setTitles(title);
       console.log(selectedTitle);
-      if (selectedTitle == undefined) {
-        setSelectedTitle("Environmental Issues");
-      }
     });
-  };
+  }
 
   const getQuiz = () => {
-    var query;
-    if (selectedTitle == undefined) {
-      query = ref.where("title", "==", "Environmental Issues");
-    } else {
-      query = ref.where("title", "==", selectedTitle);
-    }
-    query.onSnapshot((querySnapShot) => {
-      const questions = [];
-      querySnapShot.forEach((quiz) => {
-        quiz.ref.collection("questions").onSnapshot((querySnapShot) => {
-          querySnapShot.forEach((quiz) => {
-            questions.push(quiz.data());
-          });
-          console.log(questions.length);
-          setQuizzes(questions);
+    
+    ref
+      .doc(selectedTitle)
+      .collection("questions")
+      .onSnapshot((querySnapShot) => {
+        const questions = [];
+        querySnapShot.forEach((question) => {
+          questions.push(question.data());
         });
+        setQuizzes(questions);
       });
-    });
+  };
+
+  const deleteQuestion = () => {
+    var docID = localStorage.getItem("docID");
+
+    ref
+      .doc(selectedTitle)
+      .collection("questions")
+      .doc(docID)
+      .delete()
+      .then(() => {
+        if (
+          quizzes.slice(pageVisited, pageVisited + quizzesPerPage).length <= 1
+        ) {
+          setPageNumber((previousPage) => previousPage - 1);
+        }
+        setModalDeleteShow(false);
+      });
   };
 
   useEffect(() => {
-    getQuizTitle();
+    getTitle();
     getQuiz();
   }, [selectedTitle]);
 
   return (
     <>
+      <QuizPopupDelete
+        show={modalDeleteShow}
+        onHide={() => setModalDeleteShow(false)}
+        deleteQuestion={() => deleteQuestion()}
+      />
       <Form.Group controlId="formBasicSelect">
-        <Form.Label><b>Select Quizzes Chapter</b></Form.Label>
+        <Form.Label>
+          <b>Select Quizzes Chapter</b>
+        </Form.Label>
         <Form.Control
           as="select"
           value={selectedTitle}
@@ -78,10 +96,11 @@ const Quiz = () => {
         >
           {titles.map((title) => {
             return (
-            <option key={title.id} value={title.title}>
-              {title.title}
-            </option>
-          )})}
+              <option value={title.id}>
+                {title.title}
+              </option>
+            );
+          })}
         </Form.Control>
       </Form.Group>
       <table class="table">
@@ -113,12 +132,13 @@ const Quiz = () => {
                     <td>{quiz.optionD}</td>
                     <td>{quiz.answer}</td>
                     <td>
+                      <Button className="me-2">Edit</Button>
                       <Button
                         variant="danger"
                         onClick={() => {
                           setModalDeleteShow(true);
-                          //   localStorage.setItem("deleteEmail", admin.email);
-                          //   localStorage.setItem("deleteAdminId", admin.id);
+                          localStorage.setItem("question", quiz.question);
+                          localStorage.setItem("docID", quiz.id);
                         }}
                       >
                         X
