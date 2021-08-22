@@ -1,21 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "firebase/app";
+import "firebase/storage";
 import "./Quiz.css";
 import { Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Form } from "react-bootstrap";
 import QuizPopupDelete from "./QuizPopupDelete";
 import QuizPopupEdit from "./QuizPopupEdit";
-import QuizPopupAdd from "./QuizPopupAdd";
+import QuizPopupAddQuestion from "./QuizPopupAddQuestion";
+import QuizPopupAddQuiz from "./QuizPopupAddQuiz";
 
 const Quiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [modalDeleteShow, setModalDeleteShow] = useState();
   const [modalEditShow, setModalEditShow] = useState();
-  const [modalAddShow, setModalAddShow] = useState();
+  const [modalAddQuestionShow, setModalAddQuestionShow] = useState();
+  const [modalAddQuizShow, setModalAddQuizShow] = useState();
   const [titles, setTitles] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("quiz1");
+  const [collectionSize, setCollectionSize] = useState();
+
+  //Use in Add Quiz Page
+  const [quizTitle, setQuizTitle] = useState();
+  const [image, setImage] = useState(null);
 
   // To show the questions details in the edit page
   const [question, setQuestion] = useState();
@@ -27,6 +35,8 @@ const Quiz = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const ref = firebase.firestore().collection("quizzes");
+
+  const storage = firebase.storage();
 
   const quizzesPerPage = 10;
   const pageVisited = pageNumber * quizzesPerPage;
@@ -41,6 +51,7 @@ const Quiz = () => {
   // Get title of all quizzes
   const getTitle = () => {
     ref.onSnapshot((querySnapShot) => {
+      setCollectionSize(querySnapShot.size);
       const title = [];
       console.log(titles.length < 1);
       querySnapShot.forEach((quizTitle) => {
@@ -66,12 +77,15 @@ const Quiz = () => {
   };
 
   const clearInputs = () => {
+    setErrorMessage("");
+    setQuizTitle("");
     setAnswer("");
     setOptionA("");
     setOptionB("");
     setOptionC("");
     setOptionD("");
     setQuestion("");
+    setImage(null);
   };
 
   const deleteQuestion = () => {
@@ -114,11 +128,32 @@ const Quiz = () => {
       .doc(question.id)
       .set(question)
       .then(() => {
-        setModalAddShow(false);
+        setModalAddQuestionShow(false);
         clearInputs();
       })
       .catch((err) => {
         console.log(err);
+      });
+  };
+
+  const addQuiz = async (quizTitle) => {
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(
+      "quizzes/quiz" + (collectionSize + 1) + ".png"
+    );
+    await fileRef.put(image);
+
+    let imagePath = "quizzes/quiz" + (collectionSize + 1) + ".png";
+    ref
+      .doc("quiz" + (collectionSize + 1))
+      .set({
+        id: "quiz" + (collectionSize + 1),
+        image: imagePath,
+        title: quizTitle,
+      })
+      .then(() => {
+        setModalAddQuizShow(false);
+        clearInputs();
       });
   };
 
@@ -129,10 +164,25 @@ const Quiz = () => {
 
   return (
     <>
-      <QuizPopupAdd
-        show={modalAddShow}
+      <QuizPopupAddQuiz
+        show={modalAddQuizShow}
+        image={image}
+        quizTitle={quizTitle}
+        setImage={setImage}
+        setQuizTitle={setQuizTitle}
+        addQuiz={addQuiz}
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
         onHide={() => {
-          setModalAddShow(false);
+          setModalAddQuizShow(false);
+          clearInputs();
+        }}
+      />
+
+      <QuizPopupAddQuestion
+        show={modalAddQuestionShow}
+        onHide={() => {
+          setModalAddQuestionShow(false);
           clearInputs();
         }}
         question={question}
@@ -180,15 +230,23 @@ const Quiz = () => {
         editQuestion={editQuestion}
       />
 
-      <Button
-        className="mb-2"
-        variant="primary"
-        onClick={() => {
-          setModalAddShow(true);        
-        }}
-      >
-        Add New
-      </Button>
+      <div className="btn-toolbar mb-3">
+        <Button
+          className="me-2"
+          onClick={() => {
+            setModalAddQuizShow(true);
+          }}
+        >
+          Add New Quiz
+        </Button>
+        <Button
+          onClick={() => {
+            setModalAddQuestionShow(true);
+          }}
+        >
+          Add New Question
+        </Button>
+      </div>
 
       <Form.Group controlId="formBasicSelect">
         <Form.Label>

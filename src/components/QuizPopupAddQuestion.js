@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 
-const QuizPopupAdd = (props) => {
+const QuizPopupAddQuestion = (props) => {
   const {
     show,
     onHide,
@@ -33,7 +33,6 @@ const QuizPopupAdd = (props) => {
     ) {
       setErrorMessage("Please make sure there are no empty fields.");
     } else {
-      setErrorMessage("");
       if (answer.trim().length == 0) {
         setAnswer(optionA);
       }
@@ -173,4 +172,4 @@ const QuizPopupAdd = (props) => {
   );
 };
 
-export default QuizPopupAdd;
+export default QuizPopupAddQuestion;
