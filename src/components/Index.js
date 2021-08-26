@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Index.css";
 import Admin from "./Admin";
 import User from "./User";
 import Quiz from "./Quiz";
+import Course from "./Course";
 
 const Index = (props) => {
   const [selectedPage, setSelectedPage] = useState("admin");
@@ -13,10 +14,6 @@ const Index = (props) => {
 
   const setPage = (page) => {
     setSelectedPage(page);
-  };
-
-  const test = () => {
-    console.log(userEmail);
   };
 
   return (
@@ -59,7 +56,7 @@ const Index = (props) => {
                 <li class="nav-item">
                   <div id="sidebar-content" class="nav-link align-middle px-0">
                     <i class="fs-4 bi-house"></i>{" "}
-                    <span onClick={test} class="ms-1 d-none d-sm-inline">
+                    <span onClick={() => setPage("course")} class="ms-1 d-none d-sm-inline">
                       Courses
                     </span>
                   </div>
@@ -106,6 +103,8 @@ const Index = (props) => {
                   return <User />;
                 case "quiz":
                   return <Quiz />;
+                case "course":
+                  return <Course />
                 default:
                   return <Admin />;
               }

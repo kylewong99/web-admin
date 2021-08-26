@@ -15,7 +15,7 @@ const QuizPopupAddQuiz = (props) => {
   } = props;
 
   const isEmpty = () => {
-    if (quizTitle.trim().length == 0 || image == null) {
+    if (quizTitle.trim().length === 0 || image === null) {
         setErrorMessage("Please make sure there are no empty fields.");
     } else {
         addQuiz(quizTitle);

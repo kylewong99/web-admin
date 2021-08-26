@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Index from "./components/Index";
 import Login from "./components/Login";
-// import firebase from "./firebase";
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-
-import axios from "axios";
 
 function App() {
   const [user, setUser] = useState("");
@@ -32,14 +28,6 @@ function App() {
   } else {
     firebase.app();
   }
-
-  const testServer = () => {
-    axios.get("/test", {params: {
-      foo: 'bar'
-    }}).then(function (response) {
-      console.log(response.data);
-    });
-  };
 
   // Get admin collection from database
   const ref = firebase.firestore().collection("admin");
@@ -91,6 +79,8 @@ function App() {
           case "auth/wrong-password":
             setPasswordError(err.message);
             break;
+          default:
+            setPasswordError(err.message);
         }
       });
   };

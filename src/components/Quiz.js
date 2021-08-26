@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
 import "firebase/storage";
 import "./Quiz.css";
@@ -119,7 +119,7 @@ const Quiz = () => {
   };
 
   const addQuestion = (question) => {
-    if (question.answer.trim().length == 0) {
+    if (question.answer.trim().length === 0) {
       question.answer = question.optionA;
     }
     ref
@@ -136,7 +136,7 @@ const Quiz = () => {
       });
   };
 
-  const addQuiz = async (quizTitle) => {
+  const addQuiz = async () => {
     const storageRef = storage.ref();
     const fileRef = storageRef.child(
       "quizzes/quiz" + (collectionSize + 1) + ".png"
@@ -293,9 +293,8 @@ const Quiz = () => {
                     <td>{quiz.optionC}</td>
                     <td>{quiz.optionD}</td>
                     <td>{quiz.answer}</td>
-                    <td>
+                    <td align="right">
                       <Button
-                        className="me-2"
                         onClick={() => {
                           ref
                             .doc(selectedTitle)
@@ -320,6 +319,7 @@ const Quiz = () => {
                       </Button>
                       <Button
                         variant="danger"
+                        className="ms-2"
                         onClick={() => {
                           setModalDeleteShow(true);
                           localStorage.setItem("question", quiz.question);

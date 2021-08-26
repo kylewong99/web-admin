@@ -25,15 +25,15 @@ const QuizPopupAddQuestion = (props) => {
 
   const isEmpty = () => {
     if (
-      question.trim().length == 0 ||
-      optionA.trim().length == 0 ||
-      optionB.trim().length == 0 ||
-      optionC.trim().length == 0 ||
-      optionD.trim().length == 0
+      question.trim().length === 0 ||
+      optionA.trim().length === 0 ||
+      optionB.trim().length === 0 ||
+      optionC.trim().length === 0 ||
+      optionD.trim().length === 0
     ) {
       setErrorMessage("Please make sure there are no empty fields.");
     } else {
-      if (answer.trim().length == 0) {
+      if (answer.trim().length === 0) {
         setAnswer(optionA);
       }
       addQuestion({

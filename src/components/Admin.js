@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./Admin.css";
 import { Button } from "react-bootstrap";
@@ -58,7 +58,7 @@ const Admin = () => {
   const addAdmin = () => {
     const newAdmin = { email, id: uuidv4() };
     clearErrors();
-    if (confirmPassword.length == password.length) {
+    if (confirmPassword.length === password.length) {
       axios
         .get("/addAdmin", {
           params: {
@@ -68,7 +68,7 @@ const Admin = () => {
         })
         .then(function (response) {
           console.log(response.data);
-          if (response.data == "success") {
+          if (response.data === "success") {
             clearInputs();
             ref
               .doc(newAdmin.id)
@@ -77,16 +77,16 @@ const Admin = () => {
                 console.log(err);
               });
           } else if (
-            response.data ==
+            response.data ===
             "The email address is already in use by another account."
           ) {
             setEmailError(response.data);
           } else if (
-            response.data == "The email address is improperly formatted."
+            response.data === "The email address is improperly formatted."
           ) {
             setEmailError(response.data);
           } else if (
-            response.data ==
+            response.data ===
             "The password must be a string with at least 6 characters."
           ) {
             setPasswordError(response.data);
@@ -123,7 +123,7 @@ const Admin = () => {
 
   useEffect(() => {
     getAdmin();
-  }, []);
+  });
 
   return (
     <>
@@ -157,7 +157,7 @@ const Admin = () => {
             <th scope="col">No</th>
             <th scope="col">Email</th>
             <th scope="col"></th>
-          </tr>
+          </tr >
         </thead>
         <tbody>
           {admins
@@ -169,7 +169,7 @@ const Admin = () => {
                   <tr key={admin.id}>
                     <td>{counter}</td>
                     <td>{admin.email}</td>
-                    <td>
+                    <td align="right"> 
                       <Button
                         variant="danger"
                         onClick={() => {
