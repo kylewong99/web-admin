@@ -22,15 +22,15 @@ const Quiz = () => {
   const [collectionSize, setCollectionSize] = useState();
 
   //Use in Add Quiz Page
-  const [quizTitle, setQuizTitle] = useState();
+  const [quizTitle, setQuizTitle] = useState("");
   const [image, setImage] = useState(null);
 
   // To show the questions details in the edit page
-  const [question, setQuestion] = useState();
-  const [optionA, setOptionA] = useState();
-  const [optionB, setOptionB] = useState();
-  const [optionC, setOptionC] = useState();
-  const [optionD, setOptionD] = useState();
+  const [question, setQuestion] = useState("");
+  const [optionA, setOptionA] = useState("");
+  const [optionB, setOptionB] = useState("");
+  const [optionC, setOptionC] = useState("");
+  const [optionD, setOptionD] = useState("");
   const [answer, setAnswer] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -141,6 +141,7 @@ const Quiz = () => {
     const fileRef = storageRef.child(
       "quizzes/quiz" + (collectionSize + 1) + ".png"
     );
+    console.log(image);
     await fileRef.put(image);
 
     let imagePath = "quizzes/quiz" + (collectionSize + 1) + ".png";

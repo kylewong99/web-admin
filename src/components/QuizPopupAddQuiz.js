@@ -58,6 +58,7 @@ const QuizPopupAddQuiz = (props) => {
                 <div class="col-sm-9">
                   <input
                     type="file"
+                    accept="image/*"
                     onChange={(e) => setImage(e.target.files[0])}
                   />
                 </div>

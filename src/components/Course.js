@@ -4,6 +4,7 @@ import { Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import firebase from "firebase/app";
 import CourseEdit from "./CourseEdit";
+import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
 import "firebase/storage";
 import "./Course.css";
 
@@ -15,6 +16,7 @@ const Course = () => {
   const [collectionSize, setCollectionSize] = useState();
   const [errorMessage, setErrorMessage] = useState("");
   const [modalAddCourseShow, setModalAddCourseShow] = useState();
+  const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
 
   const [courseEdit, setCourseEdit] = useState("false");
 
@@ -26,6 +28,7 @@ const Course = () => {
 
   const storage = firebase.storage();
   const courseID = localStorage.getItem("courseID");
+  const topicID = localStorage.getItem("topicID");
 
   const coursesPerPage = 10;
   const pageVisited = pageNumber * coursesPerPage;
@@ -74,6 +77,11 @@ const Course = () => {
       });
   };
 
+  const deleteTopic = () => {
+    setModalDeleteTopicShow(false);
+    ref.doc(courseID).collection("topics").doc(topicID).delete();
+  };
+
   const addCourse = async () => {};
 
   useEffect(() => {
@@ -87,6 +95,13 @@ const Course = () => {
         <CourseEdit setCourseEdit={setCourseEdit} />
       ) : (
         <>
+          <CoursePopupDeleteTopic
+            show={modalDeleteTopicShow}
+            deleteTopic={deleteTopic}
+            onHide={() => {
+              setModalDeleteTopicShow(false);
+            }}
+          />
           <div class="row">
             <div class="col">
               <nav aria-label="breadcrumb">
@@ -147,48 +162,18 @@ const Course = () => {
                         <td>{counter}</td>
                         <td>{course.title}</td>
                         <td align="right">
-                          {/* <Button
-                        className="me-2"
-                        onClick={() => {
-                          ref
-                            .doc(selectedTitle)
-                            .collection("questions")
-                            .doc(quiz.id)
-                            .get()
-                            .then((quiz) => {
-                              setQuestion(quiz.data().question);
-                              setOptionA(quiz.data().optionA);
-                              setOptionB(quiz.data().optionB);
-                              setOptionC(quiz.data().optionC);
-                              setOptionD(quiz.data().optionD);
-                              setAnswer(quiz.data().answer);
-                            })
-                            .then(() => {
-                              setModalEditShow(true);
-                              localStorage.setItem("docID", quiz.id);
-                            });
-                        }}
-                      >
-                        Edit
-                      </Button> */}
                           <Button
                             variant="danger"
-                            // onClick={() => {
-                            //   setModalDeleteShow(true);
-                            //   localStorage.setItem("question", quiz.question);
-                            //   localStorage.setItem("docID", quiz.id);
-                            // }}
+                            onClick={() => {
+                              setModalDeleteTopicShow(true);
+                              localStorage.setItem("topicID", course.id);
+                            }}
                           >
                             X
                           </Button>
                           <Button
                             variant="primary"
                             className="ms-2"
-                            // onClick={() => {
-                            //   setModalDeleteShow(true);
-                            //   localStorage.setItem("question", quiz.question);
-                            //   localStorage.setItem("docID", quiz.id);
-                            // }}
                             onClick={() => {
                               localStorage.setItem("topicID", course.id);
                               localStorage.setItem("courseTitle", course.title);
