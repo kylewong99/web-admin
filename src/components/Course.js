@@ -9,26 +9,21 @@ import "firebase/storage";
 import "./Course.css";
 
 const Course = () => {
+  const ref = firebase.firestore().collection("courses");
+  const storage = firebase.storage();
+
   const [courses, setCourses] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [titles, setTitles] = useState([]);
-  const [selectedTitle, setSelectedTitle] = useState("course1");
-  const [collectionSize, setCollectionSize] = useState();
+  const [selectedTitle, setSelectedTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [modalAddCourseShow, setModalAddCourseShow] = useState();
   const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
-
   const [courseEdit, setCourseEdit] = useState("false");
 
   //Use in Add Course Page
   const [courseTitle, setCourseTitle] = useState();
   const [image, setImage] = useState(null);
-
-  const ref = firebase.firestore().collection("courses");
-
-  const storage = firebase.storage();
-  const courseID = localStorage.getItem("courseID");
-  const topicID = localStorage.getItem("topicID");
 
   const coursesPerPage = 10;
   const pageVisited = pageNumber * coursesPerPage;
@@ -49,43 +44,66 @@ const Course = () => {
   // Get title of all courses
   const getTitle = () => {
     ref.onSnapshot((querySnapShot) => {
-      setCollectionSize(querySnapShot.size);
       const title = [];
-      console.log(titles.length < 1);
       querySnapShot.forEach((courseTitle) => {
         title.push(courseTitle.data());
       });
       setTitles(title);
-      console.log(selectedTitle);
+      localStorage.setItem("title", JSON.stringify(title));
     });
   };
 
   // Get all courses from the selected quiz
-  const getCourse = () => {
-    if (courseID.trim().length === 0 || courseID === undefined) {
-      localStorage.setItem("courseID", "course1");
-    }
-    ref
-      .doc(selectedTitle)
-      .collection("topics")
-      .onSnapshot((querySnapShot) => {
-        const courses = [];
-        querySnapShot.forEach((course) => {
-          courses.push(course.data());
+  const getCourse = async () => {
+    await getTitle();
+    const title = JSON.parse(localStorage.getItem("title"));
+
+    if (title.length > 0) {
+      let chosenTitle = "";
+
+      if (selectedTitle.trim().length === 0) {
+        chosenTitle = title[0].id;
+        localStorage.setItem("courseID", title[0].id);
+      } else {
+        chosenTitle = selectedTitle;
+      }
+
+      ref
+        .doc(chosenTitle)
+        .collection("topics")
+        .onSnapshot((querySnapShot) => {
+          const courses = [];
+          querySnapShot.forEach((course) => {
+            courses.push(course.data());
+          });
+          setCourses(courses);
         });
-        setCourses(courses);
-      });
+    }
   };
 
   const deleteTopic = () => {
+    const courseID = localStorage.getItem("courseID");
+    const topicID = localStorage.getItem("topicID");
     setModalDeleteTopicShow(false);
     ref.doc(courseID).collection("topics").doc(topicID).delete();
+  };
+
+  const deleteCourse = async () => {
+    const courseID = localStorage.getItem("courseID");
+    await ref.doc(courseID).delete();
+    await getTitle();
+    const title = JSON.parse(localStorage.getItem("title"));
+    if (title.length === 0) {
+      await setSelectedTitle("");
+    } else {
+      await setSelectedTitle(title[0].id);
+      localStorage.setItem("courseID", title[0].id);
+    }
   };
 
   const addCourse = async () => {};
 
   useEffect(() => {
-    getTitle();
     getCourse();
   }, [selectedTitle]);
 
@@ -121,6 +139,14 @@ const Course = () => {
                   //   }}
                 >
                   Create Course
+                </Button>
+                <Button>Edit Course</Button>
+                <Button
+                  onClick={() => deleteCourse()}
+                  variant="danger"
+                  className="ms-2"
+                >
+                  Delete Course
                 </Button>
               </div>
             </div>
