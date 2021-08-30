@@ -9,7 +9,7 @@ const CourseEdit = (props) => {
   const { setCourseEdit } = props;
 
   const [topics, setTopics] = useState([]);
-  const [imageURL, setImageURL] = useState([null]);
+  const [imageURL, setImageURL] = useState([]);
   const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
   const [modalEditTopicShow, setModalEditTopicShow] = useState();
 
@@ -40,10 +40,14 @@ const CourseEdit = (props) => {
   const getTopic = async () => {
     ref.onSnapshot(async (topic) => {
       const topics = [];
+      let imageList = [];
       topics.push(topic.data());
       console.log(topics);
       setTopics(topics);
-      const imageList = await getImage(topics[0]);
+      if (topics[0].noImage > 0) {
+        imageList = await getImage(topics[0]);
+      }
+      console.log(imageList);
       setImageURL(imageList);
     });
   };
@@ -52,6 +56,7 @@ const CourseEdit = (props) => {
     const imageList = [];
     if (topics != undefined) {
       for (let i = 1; i <= topics.noImage; i++) {
+        console.log("how");
         const imageURL = await storage
           .ref()
           .child(topics["image" + i])
@@ -77,8 +82,6 @@ const CourseEdit = (props) => {
         content={content}
         setTitle={setTitle}
         setContent={setContent}
-        imageURL={imageURL}
-        getTopic={() => getTopic()}
         onHide={() => {
           setModalEditTopicShow(false);
         }}
@@ -111,6 +114,7 @@ const CourseEdit = (props) => {
               <Button
                 className="me-2"
                 onClick={() => {
+                  localStorage.setItem("imageURL",JSON.stringify(imageURL));
                   setModalEditTopicShow(true);
                   setTitle(topics[0].title);
                   setContent(topics[0].content);
@@ -141,35 +145,39 @@ const CourseEdit = (props) => {
               <>
                 <tr>
                   <th>Title</th>
-                  {/* <td>{counter}</td> */}
                   <td>{topic.title}</td>
                 </tr>
                 <tr key={topic.id}>
                   <th>Content</th>
                   <td>
-                    {(topic.content != undefined) && topic.content.replaceAll(/ /g, "\u00a0").split("\n").map((item) => {
-                      return (
-                        <>
-                          {item}
-                          <br />
-                        </>
-                      );
-                    })}
+                    {topic.content != undefined &&
+                      topic.content
+                        .replaceAll(/ /g, "\u00a0")
+                        .split("\n")
+                        .map((item) => {
+                          return (
+                            <>
+                              {item}
+                              <br />
+                            </>
+                          );
+                        })}
                   </td>
                 </tr>
-                {imageURL.map((image) => {
-                  counter += 1;
-                  return (
-                    <>
-                      <tr>
-                        <th>Image{counter}</th>
-                        <td>
-                          <img width="200" height="200" src={image} />
-                        </td>
-                      </tr>
-                    </>
-                  );
-                })}
+                {imageURL.length > 0 &&
+                  imageURL.map((image) => {
+                    counter += 1;
+                    return (
+                      <>
+                        <tr>
+                          <th>Image{counter}</th>
+                          <td>
+                            <img width="200" height="200" src={image} />
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
               </>
             );
           })}

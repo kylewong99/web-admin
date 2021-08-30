@@ -9,14 +9,16 @@ const CoursePopupEditTopic = (props) => {
     title,
     content,
     setTitle,
-    setContent,
-    imageURL,
-    getTopic,
+    setContent
   } = props;
 
   const topicID = localStorage.getItem("topicID");
   const courseID = localStorage.getItem("courseID");
+  const imageURL = JSON.parse(localStorage.getItem("imageURL"));
+
   const storage = firebase.storage();
+
+
   const storageRef = storage.ref();
   const ref = firebase
     .firestore()
@@ -27,6 +29,7 @@ const CoursePopupEditTopic = (props) => {
 
   let counter = 1;
   let imageIDlist = [];
+  
 
   const addImage = () => {
     let noImage = counter;
@@ -149,8 +152,8 @@ const CoursePopupEditTopic = (props) => {
           );
         }
       }
+
       ref.set(topic).then(() => {
-        getTopic();
         onHide();
       });
     }
@@ -175,7 +178,7 @@ const CoursePopupEditTopic = (props) => {
               <div id="inputs">
                 <div class="form-group row mb-3">
                   <label class="col-sm-3 col-form-label">
-                    <b>Topic title:</b>
+                    <b>Topic title: </b>
                   </label>
                   <div class="col-sm-9">
                     <input
@@ -210,7 +213,7 @@ const CoursePopupEditTopic = (props) => {
                     </div>
                   </div>
                 </div>
-                {imageURL.map((image) => {
+                {imageURL != null && imageURL.map((image) => {
                   let noImage = counter;
                   imageIDlist.push(noImage);
                   let inputIDname = "inputImage" + noImage;
@@ -224,7 +227,7 @@ const CoursePopupEditTopic = (props) => {
                         <div class="form-group row mb-3">
                           <label class="col-sm-3 col-form-label">
                             <b id={imageLabel}>
-                              Image{imageIDlist.indexOf(noImage) + 1}:
+                              Image{imageIDlist.indexOf(noImage) + 1} :
                             </b>
                           </label>
                           <div class="col-sm-9">
