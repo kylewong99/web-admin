@@ -127,10 +127,6 @@ const Admin = () => {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setModalAddShow(true)}>
-        Add New
-      </Button>
-
       <AdminPopupAdd
         show={modalAddShow}
         onHide={() => setModalAddShow(false)}
@@ -151,13 +147,31 @@ const Admin = () => {
         onHide={() => setModalDeleteShow(false)}
         deleteAdmin={deleteAdmin}
       />
+      <div class="row">
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item active" aria-current="page">
+                Admin
+              </li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-auto">
+          <div className="btn-toolbar">
+            <Button variant="primary" onClick={() => setModalAddShow(true)}>
+              Add New
+            </Button>
+          </div>
+        </div>
+      </div>
       <table class="table">
         <thead>
           <tr>
             <th scope="col">No</th>
             <th scope="col">Email</th>
             <th scope="col"></th>
-          </tr >
+          </tr>
         </thead>
         <tbody>
           {admins
@@ -169,7 +183,7 @@ const Admin = () => {
                   <tr key={admin.id}>
                     <td>{counter}</td>
                     <td>{admin.email}</td>
-                    <td align="right"> 
+                    <td align="right">
                       <Button
                         variant="danger"
                         onClick={() => {
