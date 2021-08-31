@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
 
-const CoursePopupAddCourse = (props) => {
+const CoursePopupEditCourse = (props) => {
   const {
     show,
     courseTitle,
@@ -11,16 +11,27 @@ const CoursePopupAddCourse = (props) => {
     onHide,
     errorMessage,
     setErrorMessage,
-    addCourse,
+    editCourse,
   } = props;
 
+  const checkImageEmpty = () => {
+    if (document.getElementById("image").src.trim().length === 0 ) {
+        return true;
+    } else {
+        return false;
+    }
+  }
+
   const isEmpty = () => {
-    if (courseTitle.trim().length === 0 || image === null) {
+    console.log(checkImageEmpty());
+    if (courseTitle.trim().length === 0 || checkImageEmpty()) {
       setErrorMessage("Please make sure there are no empty fields.");
     } else {
-      addCourse();
+      editCourse();
     }
   };
+
+  const imageURL = localStorage.getItem("courseImageURL");
 
   return (
     <div>
@@ -33,7 +44,7 @@ const CoursePopupAddCourse = (props) => {
         >
           <Modal.Header>
             <Modal.Title id="contained-modal-title-vcenter">
-              Add Course
+              Edit Course
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -56,7 +67,7 @@ const CoursePopupAddCourse = (props) => {
                   <b>Course Cover Page Image:</b>
                 </label>
                 <div class="col-sm-9">
-                  <img id="image" width="200" height="200" />
+                  <img id="image" width="200" height="200" src={imageURL} />
                 </div>
               </div>
               <div class="form-group row mb-3">
@@ -94,4 +105,4 @@ const CoursePopupAddCourse = (props) => {
   );
 };
 
-export default CoursePopupAddCourse;
+export default CoursePopupEditCourse;

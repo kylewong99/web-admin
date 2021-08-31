@@ -7,6 +7,7 @@ import CourseEdit from "./CourseEdit";
 import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
 import CoursePopupDeleteCourse from "./CoursePopupDeleteCourse";
 import CoursePopupAddCourse from "./CoursePopupAddCourse";
+import CoursePopupEditCourse from "./CoursePopupEditCourse";
 import "firebase/storage";
 import "./Course.css";
 import { v4 as uuidv4 } from "uuid";
@@ -14,16 +15,20 @@ import { v4 as uuidv4 } from "uuid";
 const Course = () => {
   const ref = firebase.firestore().collection("courses");
   const storage = firebase.storage();
+  const storageRef = storage.ref();
 
   const [courses, setCourses] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [titles, setTitles] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [modalAddCourseShow, setModalAddCourseShow] = useState();
-  const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
-  const [modalDeleteCourseShow, setModalDeleteCourseShow] = useState();
   const [courseEdit, setCourseEdit] = useState("false");
+
+  // Use for displaying and hiding popup modal
+  const [modalAddCourseShow, setModalAddCourseShow] = useState();
+  const [modalDeleteCourseShow, setModalDeleteCourseShow] = useState();
+  const [modalEditCourseShow, setModalEditCourseShow] = useState();
+  const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
 
   //Use in Add Course Page
   const [courseTitle, setCourseTitle] = useState("");
@@ -68,6 +73,7 @@ const Course = () => {
       if (selectedTitle.trim().length === 0) {
         chosenTitle = title[0].id;
         localStorage.setItem("courseID", title[0].id);
+        localStorage.setItem("courseTitle", title[0].title);
       } else {
         chosenTitle = selectedTitle;
       }
@@ -111,6 +117,7 @@ const Course = () => {
 
     const storageRef = storage.ref();
     const fileRef = storageRef.child("courses/" + courseID + ".png");
+    await fileRef.put(image);
 
     let imagePath = "courses/" + courseID + ".png";
     ref
@@ -127,6 +134,41 @@ const Course = () => {
       });
   };
 
+  const getImage = async () => {
+    let titleList = JSON.parse(localStorage.getItem("title"));
+    let courseID = localStorage.getItem("courseID");
+    let chosenTitle = titleList.filter((item) => {
+      return item.id === courseID;
+    });
+
+    const imageUrl = await storage
+      .ref()
+      .child(chosenTitle[0].image)
+      .getDownloadURL();
+
+    localStorage.setItem("courseImageURL", imageUrl);
+  };
+
+  const editCourse = async () => {
+    let courseID = localStorage.getItem("courseID");
+    if (image != null) {
+      let imageRef = "courses/" + courseID + ".png";
+      const fileRef = storageRef.child(imageRef);
+      await fileRef.put(image);
+    }
+
+    ref
+      .doc(courseID)
+      .update({
+        title: courseTitle,
+      })
+      .then(() => {
+        localStorage.setItem("courseTitle",courseTitle);
+        setModalEditCourseShow(false);
+        clearInputs();
+      });
+  };
+
   useEffect(() => {
     getCourse();
   }, [selectedTitle]);
@@ -137,6 +179,20 @@ const Course = () => {
         <CourseEdit setCourseEdit={setCourseEdit} />
       ) : (
         <>
+          <CoursePopupEditCourse
+            show={modalEditCourseShow}
+            courseTitle={courseTitle}
+            image={image}
+            setCourseTitle={setCourseTitle}
+            setImage={setImage}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            editCourse={editCourse}
+            onHide={() => {
+              setModalEditCourseShow(false);
+              clearInputs();
+            }}
+          />
           <CoursePopupAddCourse
             show={modalAddCourseShow}
             courseTitle={courseTitle}
@@ -183,7 +239,15 @@ const Course = () => {
                 >
                   Create Course
                 </Button>
-                <Button>Edit Course</Button>
+                <Button
+                  onClick={async () => {
+                    await getImage();
+                    setCourseTitle(localStorage.getItem("courseTitle"));
+                    setModalEditCourseShow(true);
+                  }}
+                >
+                  Edit Course
+                </Button>
                 <Button
                   onClick={() => setModalDeleteCourseShow(true)}
                   variant="danger"
@@ -204,12 +268,20 @@ const Course = () => {
               onChange={(e) => {
                 console.log("e.target.value", e.target.value);
                 localStorage.setItem("courseID", e.target.value);
+                let courseTitle = document.getElementById(
+                  e.target.value
+                ).innerHTML;
+                localStorage.setItem("courseTitle", courseTitle);
                 setSelectedTitle(e.target.value);
                 getCourse();
               }}
             >
               {titles.map((title) => {
-                return <option value={title.id}>{title.title}</option>;
+                return (
+                  <option id={title.id} value={title.id}>
+                    {title.title}
+                  </option>
+                );
               })}
             </Form.Control>
           </Form.Group>
