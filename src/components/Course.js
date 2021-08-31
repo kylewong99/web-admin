@@ -4,10 +4,11 @@ import { Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import firebase from "firebase/app";
 import CourseEdit from "./CourseEdit";
-import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
 import CoursePopupDeleteCourse from "./CoursePopupDeleteCourse";
 import CoursePopupAddCourse from "./CoursePopupAddCourse";
 import CoursePopupEditCourse from "./CoursePopupEditCourse";
+import CoursePopupAddTopic from "./CoursePopupAddTopic";
+import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
 import "firebase/storage";
 import "./Course.css";
 import { v4 as uuidv4 } from "uuid";
@@ -28,11 +29,16 @@ const Course = () => {
   const [modalAddCourseShow, setModalAddCourseShow] = useState();
   const [modalDeleteCourseShow, setModalDeleteCourseShow] = useState();
   const [modalEditCourseShow, setModalEditCourseShow] = useState();
+  const [modalAddTopicShow, setModalAddTopicShow] = useState();
   const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
 
   //Use in Add Course Page
   const [courseTitle, setCourseTitle] = useState("");
   const [image, setImage] = useState(null);
+
+  //Use in Add Topic Page
+  const [topicTitle, setTopicTitle] = useState("");
+  const [topicContent, setTopicContent] = useState("");
 
   const coursesPerPage = 10;
   const pageVisited = pageNumber * coursesPerPage;
@@ -114,7 +120,6 @@ const Course = () => {
 
   const addCourse = async () => {
     let courseID = uuidv4();
-
     const storageRef = storage.ref();
     const fileRef = storageRef.child("courses/" + courseID + ".png");
     await fileRef.put(image);
@@ -163,7 +168,7 @@ const Course = () => {
         title: courseTitle,
       })
       .then(() => {
-        localStorage.setItem("courseTitle",courseTitle);
+        localStorage.setItem("courseTitle", courseTitle);
         setModalEditCourseShow(false);
         clearInputs();
       });
@@ -179,6 +184,17 @@ const Course = () => {
         <CourseEdit setCourseEdit={setCourseEdit} />
       ) : (
         <>
+          <CoursePopupAddTopic
+            show={modalAddTopicShow}
+            topicTitle={topicTitle}
+            topicContent={topicContent}
+            setTopicTitle={setTopicTitle}
+            setTopicContent={setTopicContent}
+            onHide={() => {
+              setModalAddTopicShow(false);
+            }}
+          />
+
           <CoursePopupEditCourse
             show={modalEditCourseShow}
             courseTitle={courseTitle}
@@ -285,12 +301,20 @@ const Course = () => {
               })}
             </Form.Control>
           </Form.Group>
-          <table class="table">
+          <table class="table mt-1">
             <thead>
               <tr>
                 <th scope="col">No</th>
-                <th scope="col">title</th>
-                <th scope="col"></th>
+                <th scope="col">Topic Title</th>
+                <th style={{ textAlign: "right" }} scope="col">
+                  <Button
+                    onClick={() => {
+                      setModalAddTopicShow(true);
+                    }}
+                  >
+                    Add Topic
+                  </Button>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -318,7 +342,7 @@ const Course = () => {
                             className="ms-2"
                             onClick={() => {
                               localStorage.setItem("topicID", course.id);
-                              localStorage.setItem("courseTitle", course.title);
+                              localStorage.setItem("topicTitle", course.title);
                               setCourseEdit("true");
                             }}
                           >

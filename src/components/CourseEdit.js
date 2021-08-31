@@ -17,6 +17,7 @@ const CourseEdit = (props) => {
   const [content, setContent] = useState("");
 
   const courseID = localStorage.getItem("courseID");
+  const topicTitle = localStorage.getItem("topicTitle");
   const courseTitle = localStorage.getItem("courseTitle");
   const topicID = localStorage.getItem("topicID");
 
@@ -104,6 +105,9 @@ const CourseEdit = (props) => {
               </li>
               <li class="breadcrumb-item active" aria-current="page">
                 {courseTitle}
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">
+                {topicTitle}
               </li>
             </ol>
           </nav>
