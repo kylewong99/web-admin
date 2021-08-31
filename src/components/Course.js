@@ -5,8 +5,11 @@ import ReactPaginate from "react-paginate";
 import firebase from "firebase/app";
 import CourseEdit from "./CourseEdit";
 import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
+import CoursePopupDeleteCourse from "./CoursePopupDeleteCourse";
+import CoursePopupAddCourse from "./CoursePopupAddCourse";
 import "firebase/storage";
 import "./Course.css";
+import { v4 as uuidv4 } from "uuid";
 
 const Course = () => {
   const ref = firebase.firestore().collection("courses");
@@ -19,10 +22,11 @@ const Course = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [modalAddCourseShow, setModalAddCourseShow] = useState();
   const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
+  const [modalDeleteCourseShow, setModalDeleteCourseShow] = useState();
   const [courseEdit, setCourseEdit] = useState("false");
 
   //Use in Add Course Page
-  const [courseTitle, setCourseTitle] = useState();
+  const [courseTitle, setCourseTitle] = useState("");
   const [image, setImage] = useState(null);
 
   const coursesPerPage = 10;
@@ -91,6 +95,7 @@ const Course = () => {
   const deleteCourse = async () => {
     const courseID = localStorage.getItem("courseID");
     await ref.doc(courseID).delete();
+    setModalDeleteCourseShow(false);
     await getTitle();
     const title = JSON.parse(localStorage.getItem("title"));
     if (title.length === 0) {
@@ -101,7 +106,26 @@ const Course = () => {
     }
   };
 
-  const addCourse = async () => {};
+  const addCourse = async () => {
+    let courseID = uuidv4();
+
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child("courses/" + courseID + ".png");
+
+    let imagePath = "courses/" + courseID + ".png";
+    ref
+      .doc(courseID)
+      .set({
+        clicked: 0,
+        id: courseID,
+        image: imagePath,
+        title: courseTitle,
+      })
+      .then(() => {
+        setModalAddCourseShow(false);
+        clearInputs();
+      });
+  };
 
   useEffect(() => {
     getCourse();
@@ -113,6 +137,25 @@ const Course = () => {
         <CourseEdit setCourseEdit={setCourseEdit} />
       ) : (
         <>
+          <CoursePopupAddCourse
+            show={modalAddCourseShow}
+            courseTitle={courseTitle}
+            image={image}
+            setCourseTitle={setCourseTitle}
+            setImage={setImage}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            addCourse={addCourse}
+            onHide={() => {
+              setModalAddCourseShow(false);
+              clearInputs();
+            }}
+          />
+          <CoursePopupDeleteCourse
+            show={modalDeleteCourseShow}
+            deleteCourse={deleteCourse}
+            onHide={() => setModalDeleteCourseShow(false)}
+          />
           <CoursePopupDeleteTopic
             show={modalDeleteTopicShow}
             deleteTopic={deleteTopic}
@@ -134,15 +177,15 @@ const Course = () => {
               <div className="btn-toolbar">
                 <Button
                   className="me-2"
-                  //   onClick={() => {
-                  //     setModalAddQuizShow(true);
-                  //   }}
+                  onClick={() => {
+                    setModalAddCourseShow(true);
+                  }}
                 >
                   Create Course
                 </Button>
                 <Button>Edit Course</Button>
                 <Button
-                  onClick={() => deleteCourse()}
+                  onClick={() => setModalDeleteCourseShow(true)}
                   variant="danger"
                   className="ms-2"
                 >
@@ -162,6 +205,7 @@ const Course = () => {
                 console.log("e.target.value", e.target.value);
                 localStorage.setItem("courseID", e.target.value);
                 setSelectedTitle(e.target.value);
+                getCourse();
               }}
             >
               {titles.map((title) => {
