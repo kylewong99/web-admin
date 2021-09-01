@@ -163,7 +163,7 @@ const CoursePopupAddTopic = (props) => {
         >
           <Modal.Header>
             <Modal.Title id="contained-modal-title-vcenter">
-              Edit Topic
+              Add Topic
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
