@@ -62,9 +62,6 @@ function App() {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        localStorage.setItem("email", email);
-      })
       .catch((err) => {
         console.log(err.code);
         switch (err.code) {
@@ -108,7 +105,7 @@ function App() {
   return (
     <>
       {user ? (
-        <Index handleLogout={handleLogout} />
+        <Index email={email} handleLogout={handleLogout} />
       ) : (
         <Login
           email={email}

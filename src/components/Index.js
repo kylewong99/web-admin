@@ -8,9 +8,7 @@ import Course from "./Course";
 const Index = (props) => {
   const [selectedPage, setSelectedPage] = useState("admin");
 
-  const { handleLogout } = props;
-
-  const userEmail = localStorage.getItem("email");
+  const { email, handleLogout } = props;
 
   const setPage = (page) => {
     setSelectedPage(page);
@@ -88,7 +86,7 @@ const Index = (props) => {
               <div class="pb-4">
                 <div class="d-flex align-items-center text-white text-decoration-none text-wrap mb-2">
                   <span>
-                    <h2>Welcome,</h2> {userEmail}
+                    <h2>Welcome,</h2> {email}
                   </span>
                 </div>
               </div>
