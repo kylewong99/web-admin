@@ -57,27 +57,35 @@ const Course = () => {
   };
 
   // Get title of all courses
-  const getTitle = () => {
-    ref.onSnapshot((querySnapShot) => {
-      const title = [];
-      querySnapShot.forEach((courseTitle) => {
-        title.push(courseTitle.data());
+  const getTitle = async () => {
+    return new Promise((resolve, reject) => {
+      ref.onSnapshot((querySnapShot) => {
+        const title = [];
+        querySnapShot.forEach((courseTitle) => {
+          title.push(courseTitle.data());
+        });
+        setTitles(title);
+        console.log(selectedTitle);
+
+        resolve(title);
       });
-      setTitles(title);
-      localStorage.setItem("title", JSON.stringify(title));
     });
   };
 
   // Get all courses from the selected quiz
   const getCourse = async () => {
-    if (localStorage.getItem("courseID") === null) {
-      localStorage.setItem("courseID", " ");
-    }
-    setSelectedTitle(localStorage.getItem("courseID"));
-    await getTitle();
-    const title = JSON.parse(localStorage.getItem("title"));
+    const title = await getTitle();
 
-    if (title.length > 0) {
+    if (title != null) {
+      if (localStorage.getItem("courseID") === null) {
+        localStorage.setItem("courseID", title[0].id);
+      }
+      if (localStorage.getItem("topicTitle") === null) {
+        localStorage.setItem("topicTitle", title[0].title);
+      }
+
+      setSelectedTitle(localStorage.getItem("courseID"));
+
       let chosenTitle = "";
 
       if (selectedTitle.trim().length === 0) {
@@ -110,8 +118,9 @@ const Course = () => {
     const courseID = localStorage.getItem("courseID");
     await ref.doc(courseID).delete();
     setModalDeleteCourseShow(false);
-    await getTitle();
-    const title = JSON.parse(localStorage.getItem("title"));
+
+    const title = await getTitle();
+
     if (title.length === 0) {
       await setSelectedTitle("");
     } else {
@@ -142,8 +151,8 @@ const Course = () => {
   };
 
   const getImage = async () => {
-    let titleList = JSON.parse(localStorage.getItem("title"));
-    let courseID = localStorage.getItem("courseID");
+    let titleList = await getTitle();
+    let courseID = selectedTitle;
     let chosenTitle = titleList.filter((item) => {
       return item.id === courseID;
     });
@@ -157,7 +166,7 @@ const Course = () => {
   };
 
   const editCourse = async () => {
-    let courseID = localStorage.getItem("courseID");
+    let courseID = selectedTitle;
     if (image != null) {
       let imageRef = "courses/" + courseID + ".png";
       const fileRef = storageRef.child(imageRef);
@@ -260,7 +269,15 @@ const Course = () => {
                 <Button
                   onClick={async () => {
                     await getImage();
-                    setCourseTitle(localStorage.getItem("courseTitle"));
+                    if (localStorage.getItem("courseTitle") === null) {
+                      let courseList = await getTitle();
+                      let chosenTitle = courseList.filter((item) => {
+                        return item.id === selectedTitle;
+                      });
+                      setCourseTitle(chosenTitle[0].title);
+                    } else {
+                      setCourseTitle(localStorage.getItem("courseTitle"));
+                    }
                     setModalEditCourseShow(true);
                   }}
                 >

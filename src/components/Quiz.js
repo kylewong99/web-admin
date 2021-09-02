@@ -10,6 +10,7 @@ import QuizPopupEdit from "./QuizPopupEdit";
 import QuizPopupAddQuestion from "./QuizPopupAddQuestion";
 import QuizPopupAddQuiz from "./QuizPopupAddQuiz";
 import QuizPopupDeleteQuiz from "./QuizPopupDeleteQuiz";
+import QuizPopupEditQuiz from "./QuizPopupEditQuiz";
 import { v4 as uuidv4 } from "uuid";
 
 const Quiz = () => {
@@ -24,6 +25,7 @@ const Quiz = () => {
   const [modalAddQuestionShow, setModalAddQuestionShow] = useState();
   const [modalAddQuizShow, setModalAddQuizShow] = useState();
   const [modalDeleteQuizShow, setModalDeleteQuizShow] = useState();
+  const [modalEditQuizShow, setModalEditQuizShow] = useState();
 
   //Use in Add Quiz Page
   const [quizTitle, setQuizTitle] = useState("");
@@ -41,6 +43,7 @@ const Quiz = () => {
   const ref = firebase.firestore().collection("quizzes");
 
   const storage = firebase.storage();
+  const storageRef = storage.ref();
 
   const quizzesPerPage = 10;
   const pageVisited = pageNumber * quizzesPerPage;
@@ -53,30 +56,35 @@ const Quiz = () => {
   let counter = 0;
 
   // Get title of all quizzes
-  const getTitle = () => {
-    ref.onSnapshot((querySnapShot) => {
-      const title = [];
-      console.log(titles.length < 1);
-      querySnapShot.forEach((quizTitle) => {
-        title.push(quizTitle.data());
+  const getTitle = async () => {
+    return new Promise((resolve, reject) => {
+      ref.onSnapshot((querySnapShot) => {
+        const title = [];
+        querySnapShot.forEach((quizTitle) => {
+          title.push(quizTitle.data());
+        });
+        localStorage.setItem("quizzesList", JSON.stringify(title));
+        setTitles(title);
+        resolve(title);
       });
-      setTitles(title);
-      localStorage.setItem("quizzesList", JSON.stringify(title));
     });
   };
 
   // Get all questions from the selected quiz
   const getQuiz = async () => {
-    if (localStorage.getItem("quizID") === null) {
-      localStorage.setItem("quizID", " ");
-    }
-    setSelectedTitle(localStorage.getItem("quizID"));
-    console.log(localStorage.getItem("quizID"));
-    await getTitle();
-    console.log(selectedTitle);
-    const title = JSON.parse(localStorage.getItem("quizzesList"));
+    const title = await getTitle();
 
-    if (title.length > 0) {
+    if (title != null) {
+      if (localStorage.getItem("quizID") === null) {
+        localStorage.setItem("quizID", title[0].id);
+      }
+
+      if (localStorage.getItem("quizTitle") === null) {
+        localStorage.setItem("quizTitle", title[0].title);
+      }
+
+      setSelectedTitle(localStorage.getItem("quizID"));
+
       let chosenTitle = "";
 
       if (selectedTitle.trim().length === 0) {
@@ -84,6 +92,8 @@ const Quiz = () => {
       } else {
         chosenTitle = selectedTitle;
       }
+
+      console.log(chosenTitle);
 
       ref
         .doc(chosenTitle)
@@ -161,9 +171,7 @@ const Quiz = () => {
   const addQuiz = async () => {
     let quizID = uuidv4();
     const storageRef = storage.ref();
-    const fileRef = storageRef.child(
-      "quizzes/quiz" + quizID + ".png"
-    );
+    const fileRef = storageRef.child("quizzes/quiz" + quizID + ".png");
     await fileRef.put(image);
 
     let imagePath = "quizzes/quiz" + quizID + ".png";
@@ -185,9 +193,8 @@ const Quiz = () => {
     await ref.doc(quizID).delete();
 
     setModalDeleteQuizShow(false);
-    await getTitle();
 
-    let quizzesList = JSON.parse(localStorage.getItem("quizzesList"));
+    let quizzesList = await getTitle();
 
     if (quizzesList.length === 0) {
       await setSelectedTitle("");
@@ -197,12 +204,61 @@ const Quiz = () => {
     }
   };
 
+  const getImage = async () => {
+    let quizzesList = await getTitle();
+    let quizID = selectedTitle;
+    let chosenTitle = quizzesList.filter((item) => {
+      return item.id === quizID;
+    });
+
+    const imageUrl = await storage
+      .ref()
+      .child(chosenTitle[0].image)
+      .getDownloadURL();
+
+    localStorage.setItem("quizImageURL", imageUrl);
+  };
+
+  const editQuiz = async () => {
+    let quizID = selectedTitle;
+    if (image != null) {
+      let imageRef = "quizzes/" + quizID + ".png";
+      const fileRef = storageRef.child(imageRef);
+      await fileRef.put(image);
+    }
+
+    ref
+      .doc(quizID)
+      .update({
+        title: quizTitle,
+      })
+      .then(() => {
+        localStorage.setItem("quizTitle", quizTitle);
+        setModalEditQuizShow(false);
+        clearInputs();
+      });
+  };
+
   useEffect(() => {
     getQuiz();
   }, [selectedTitle]);
 
   return (
     <>
+      <QuizPopupEditQuiz
+        show={modalEditQuizShow}
+        quizTitle={quizTitle}
+        setQuizTitle={setQuizTitle}
+        setImage={setImage}
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+        editQuiz={editQuiz}
+        onHide={() => {
+          setModalEditQuizShow(false);
+          clearInputs();
+        }}
+      />
+
       <QuizPopupDeleteQuiz
         show={modalDeleteQuizShow}
         deleteQuiz={deleteQuiz}
@@ -297,7 +353,23 @@ const Quiz = () => {
             >
               Create New Quiz
             </Button>
-            <Button>Edit Quiz</Button>
+            <Button
+              onClick={async () => {
+                await getImage();
+                if (localStorage.getItem("quizTitle") === null) {
+                  let quizzesList = await getTitle();
+                  let chosenTitle = quizzesList.filter((item) => {
+                    return item.id === selectedTitle;
+                  });
+                  setQuizTitle(chosenTitle[0].title);
+                } else {
+                  setQuizTitle(localStorage.getItem("quizTitle"));
+                }
+                setModalEditQuizShow(true);
+              }}
+            >
+              Edit Quiz
+            </Button>
             <Button
               variant="danger"
               className="ms-2"
@@ -321,11 +393,17 @@ const Quiz = () => {
           onChange={(e) => {
             console.log("e.target.value", e.target.value);
             localStorage.setItem("quizID", e.target.value);
+            let quizTitle = document.getElementById(e.target.value).innerHTML;
+            localStorage.setItem("quizTitle", quizTitle);
             setSelectedTitle(e.target.value);
           }}
         >
           {titles.map((title) => {
-            return <option value={title.id}>{title.title}</option>;
+            return (
+              <option id={title.id} value={title.id}>
+                {title.title}
+              </option>
+            );
           })}
         </Form.Control>
       </Form.Group>

@@ -17,11 +17,12 @@ const CoursePopupAddTopic = (props) => {
 
   const storage = firebase.storage();
   const storageRef = storage.ref();
-  const ref = firebase
-    .firestore()
-    .collection("courses")
-    .doc(courseID)
-    .collection("topics");
+  const ref = firebase.firestore();
+  try {
+    ref.collection("courses").doc(courseID).collection("topics");
+  } catch (e) {
+    console.log(e);
+  }
 
   let counter = 1;
   let imageIDlist = [];
@@ -144,11 +145,14 @@ const CoursePopupAddTopic = (props) => {
         );
       }
 
-      ref.doc(topicID).set(topic).then(() => {
-        onHide();
-        setTopicContent("");
-        setTopicTitle("");
-      });
+      ref
+        .doc(topicID)
+        .set(topic)
+        .then(() => {
+          onHide();
+          setTopicContent("");
+          setTopicTitle("");
+        });
     }
   };
 
