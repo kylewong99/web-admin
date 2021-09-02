@@ -70,6 +70,9 @@ const Course = () => {
 
   // Get all courses from the selected quiz
   const getCourse = async () => {
+    if (localStorage.getItem("courseID") === null) {
+      localStorage.setItem("courseID", " ");
+    }
     setSelectedTitle(localStorage.getItem("courseID"));
     await getTitle();
     const title = JSON.parse(localStorage.getItem("title"));

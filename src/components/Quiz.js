@@ -9,17 +9,21 @@ import QuizPopupDelete from "./QuizPopupDelete";
 import QuizPopupEdit from "./QuizPopupEdit";
 import QuizPopupAddQuestion from "./QuizPopupAddQuestion";
 import QuizPopupAddQuiz from "./QuizPopupAddQuiz";
+import QuizPopupDeleteQuiz from "./QuizPopupDeleteQuiz";
+import { v4 as uuidv4 } from "uuid";
 
 const Quiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
+  const [titles, setTitles] = useState([]);
+  const [selectedTitle, setSelectedTitle] = useState("");
+
+  //Use to display popup modals
   const [modalDeleteShow, setModalDeleteShow] = useState();
   const [modalEditShow, setModalEditShow] = useState();
   const [modalAddQuestionShow, setModalAddQuestionShow] = useState();
   const [modalAddQuizShow, setModalAddQuizShow] = useState();
-  const [titles, setTitles] = useState([]);
-  const [selectedTitle, setSelectedTitle] = useState("quiz1");
-  const [collectionSize, setCollectionSize] = useState();
+  const [modalDeleteQuizShow, setModalDeleteQuizShow] = useState();
 
   //Use in Add Quiz Page
   const [quizTitle, setQuizTitle] = useState("");
@@ -51,29 +55,47 @@ const Quiz = () => {
   // Get title of all quizzes
   const getTitle = () => {
     ref.onSnapshot((querySnapShot) => {
-      setCollectionSize(querySnapShot.size);
       const title = [];
       console.log(titles.length < 1);
       querySnapShot.forEach((quizTitle) => {
         title.push(quizTitle.data());
       });
       setTitles(title);
-      console.log(selectedTitle);
+      localStorage.setItem("quizzesList", JSON.stringify(title));
     });
   };
 
   // Get all questions from the selected quiz
-  const getQuiz = () => {
-    ref
-      .doc(selectedTitle)
-      .collection("questions")
-      .onSnapshot((querySnapShot) => {
-        const questions = [];
-        querySnapShot.forEach((question) => {
-          questions.push(question.data());
+  const getQuiz = async () => {
+    if (localStorage.getItem("quizID") === null) {
+      localStorage.setItem("quizID", " ");
+    }
+    setSelectedTitle(localStorage.getItem("quizID"));
+    console.log(localStorage.getItem("quizID"));
+    await getTitle();
+    console.log(selectedTitle);
+    const title = JSON.parse(localStorage.getItem("quizzesList"));
+
+    if (title.length > 0) {
+      let chosenTitle = "";
+
+      if (selectedTitle.trim().length === 0) {
+        chosenTitle = title[0].id;
+      } else {
+        chosenTitle = selectedTitle;
+      }
+
+      ref
+        .doc(chosenTitle)
+        .collection("questions")
+        .onSnapshot((querySnapShot) => {
+          const questions = [];
+          querySnapShot.forEach((question) => {
+            questions.push(question.data());
+          });
+          setQuizzes(questions);
         });
-        setQuizzes(questions);
-      });
+    }
   };
 
   const clearInputs = () => {
@@ -137,18 +159,18 @@ const Quiz = () => {
   };
 
   const addQuiz = async () => {
+    let quizID = uuidv4();
     const storageRef = storage.ref();
     const fileRef = storageRef.child(
-      "quizzes/quiz" + (collectionSize + 1) + ".png"
+      "quizzes/quiz" + quizID + ".png"
     );
-    console.log(image);
     await fileRef.put(image);
 
-    let imagePath = "quizzes/quiz" + (collectionSize + 1) + ".png";
+    let imagePath = "quizzes/quiz" + quizID + ".png";
     ref
-      .doc("quiz" + (collectionSize + 1))
+      .doc(quizID)
       .set({
-        id: "quiz" + (collectionSize + 1),
+        id: quizID,
         image: imagePath,
         title: quizTitle,
       })
@@ -158,13 +180,37 @@ const Quiz = () => {
       });
   };
 
+  const deleteQuiz = async () => {
+    let quizID = localStorage.getItem("quizID");
+    await ref.doc(quizID).delete();
+
+    setModalDeleteQuizShow(false);
+    await getTitle();
+
+    let quizzesList = JSON.parse(localStorage.getItem("quizzesList"));
+
+    if (quizzesList.length === 0) {
+      await setSelectedTitle("");
+    } else {
+      await setSelectedTitle(quizzesList[0].id);
+      localStorage.setItem("quizID", quizzesList[0].id);
+    }
+  };
+
   useEffect(() => {
-    getTitle();
     getQuiz();
   }, [selectedTitle]);
 
   return (
     <>
+      <QuizPopupDeleteQuiz
+        show={modalDeleteQuizShow}
+        deleteQuiz={deleteQuiz}
+        onHide={() => {
+          setModalDeleteQuizShow(false);
+        }}
+      />
+
       <QuizPopupAddQuiz
         show={modalAddQuizShow}
         image={image}
@@ -231,22 +277,38 @@ const Quiz = () => {
         editQuestion={editQuestion}
       />
 
-      <div className="btn-toolbar mb-3">
-        <Button
-          className="me-2"
-          onClick={() => {
-            setModalAddQuizShow(true);
-          }}
-        >
-          Add New Quiz
-        </Button>
-        <Button
-          onClick={() => {
-            setModalAddQuestionShow(true);
-          }}
-        >
-          Add New Question
-        </Button>
+      <div class="row">
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item active" aria-current="page">
+                Quizzes
+              </li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-auto">
+          <div className="btn-toolbar">
+            <Button
+              className="me-2"
+              onClick={() => {
+                setModalAddQuizShow(true);
+              }}
+            >
+              Create New Quiz
+            </Button>
+            <Button>Edit Quiz</Button>
+            <Button
+              variant="danger"
+              className="ms-2"
+              onClick={() => {
+                setModalDeleteQuizShow(true);
+              }}
+            >
+              Delete Quiz
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Form.Group controlId="formBasicSelect">
@@ -258,6 +320,7 @@ const Quiz = () => {
           value={selectedTitle}
           onChange={(e) => {
             console.log("e.target.value", e.target.value);
+            localStorage.setItem("quizID", e.target.value);
             setSelectedTitle(e.target.value);
           }}
         >
@@ -276,7 +339,15 @@ const Quiz = () => {
             <th scope="col">Option C</th>
             <th scope="col">Option D</th>
             <th scope="col">Answer</th>
-            <th scope="col"></th>
+            <th style={{ textAlign: "right", width: "11%" }} scope="col">
+              <Button
+                onClick={() => {
+                  setModalAddQuestionShow(true);
+                }}
+              >
+                Add Question
+              </Button>
+            </th>
           </tr>
         </thead>
         <tbody>
