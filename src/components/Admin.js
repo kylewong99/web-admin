@@ -160,7 +160,7 @@ const Admin = () => {
         <div class="col-auto">
           <div className="btn-toolbar">
             <Button variant="primary" onClick={() => setModalAddShow(true)}>
-              Add New
+              Add New Admin
             </Button>
           </div>
         </div>

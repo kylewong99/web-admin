@@ -17,12 +17,11 @@ const CoursePopupAddTopic = (props) => {
 
   const storage = firebase.storage();
   const storageRef = storage.ref();
-  const ref = firebase.firestore();
-  try {
-    ref.collection("courses").doc(courseID).collection("topics");
-  } catch (e) {
-    console.log(e);
-  }
+  const ref = firebase
+    .firestore()
+    .collection("courses")
+    .doc(courseID)
+    .collection("topics");
 
   let counter = 1;
   let imageIDlist = [];

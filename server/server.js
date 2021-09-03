@@ -116,3 +116,35 @@ app.get("/addAdmin", function (req, res) {
       console.log("Error creating new user:", error);
     });
 });
+
+app.get("/addUser", function (req, res) {
+  let email = req.query.email;
+  let password = req.query.password;
+
+  admin
+    .auth()
+    .createUser({
+      email: email,
+      password: password,
+    })
+    .then((userRecord) => {
+      // See the UserRecord reference doc for the contents of userRecord.
+      console.log("Successfully created new user:", userRecord);
+      res.send("success");
+    })
+    .catch((error) => {
+      console.log(error.code);
+      switch (error.code) {
+        case "auth/email-already-exists":
+          res.send("The email address is already in use by another account.");
+          break;
+        case "auth/invalid-email":
+          res.send("The email address is improperly formatted.");
+          break;
+        case "auth/invalid-password":
+          res.send("The password must be a string with at least 6 characters.");
+          break;
+      }
+      console.log("Error creating new user:", error);
+    });
+});

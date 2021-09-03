@@ -45,8 +45,10 @@ const CourseEdit = (props) => {
       topics.push(topic.data());
       console.log(topics);
       setTopics(topics);
-      if (topics[0].noImage > 0) {
-        imageList = await getImage(topics[0]);
+      if (topics[0] != undefined) {
+        if (topics[0].noImage > 0) {
+          imageList = await getImage(topics[0]);
+        }
       }
       console.log(imageList);
       setImageURL(imageList);
@@ -118,7 +120,7 @@ const CourseEdit = (props) => {
               <Button
                 className="me-2"
                 onClick={() => {
-                  localStorage.setItem("imageURL",JSON.stringify(imageURL));
+                  localStorage.setItem("imageURL", JSON.stringify(imageURL));
                   setModalEditTopicShow(true);
                   setTitle(topics[0].title);
                   setContent(topics[0].content);
