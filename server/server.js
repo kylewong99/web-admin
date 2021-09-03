@@ -14,7 +14,7 @@ const admin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey.json");
 
 if (!admin.apps.length) {
-  console.log("lets go");
+  console.log("Web server started.");
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
@@ -146,5 +146,32 @@ app.get("/addUser", function (req, res) {
           break;
       }
       console.log("Error creating new user:", error);
+    });
+});
+
+app.get("/deleteUser", function (req, res) {
+  let param = req.query.email;
+  console.log(param);
+  admin
+    .auth()
+    .getUserByEmail(param)
+    .then((userRecord) => {
+      // See the UserRecord reference doc for the contents of userRecord.
+      console.log(`Successfully fetched user data: ${userRecord.toJSON().uid}`);
+      let uid = userRecord.toJSON().uid;
+      admin
+        .auth()
+        .deleteUser(uid)
+        .then(() => {
+          console.log("Successfully deleted user");
+          res.send("Successfully deleted user");
+        })
+        .catch((error) => {
+          console.log("Error deleting user:", error);
+          res.send("Error deleting user.");
+        });
+    })
+    .catch((error) => {
+      console.log("Error fetching user data:", error);
     });
 });

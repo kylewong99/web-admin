@@ -53,6 +53,8 @@ const Course = () => {
   const clearInputs = () => {
     setErrorMessage("");
     setCourseTitle("");
+    setTopicContent("");
+    setTopicTitle("");
     setImage(null);
   };
 
@@ -185,6 +187,18 @@ const Course = () => {
       });
   };
 
+  const addTopic = (topicID, topic) => {
+    ref
+      .doc(selectedTitle)
+      .collection("topics")
+      .doc(topicID)
+      .set(topic)
+      .then(() => {
+        setModalAddTopicShow(false);
+        clearInputs();
+      });
+  };
+
   useEffect(() => {
     getCourse();
   }, [selectedTitle]);
@@ -195,17 +209,6 @@ const Course = () => {
         <CourseEdit setCourseEdit={setCourseEdit} />
       ) : (
         <>
-          <CoursePopupAddTopic
-            show={modalAddTopicShow}
-            topicTitle={topicTitle}
-            topicContent={topicContent}
-            setTopicTitle={setTopicTitle}
-            setTopicContent={setTopicContent}
-            onHide={() => {
-              setModalAddTopicShow(false);
-            }}
-          />
-
           <CoursePopupEditCourse
             show={modalEditCourseShow}
             courseTitle={courseTitle}
@@ -220,6 +223,20 @@ const Course = () => {
               clearInputs();
             }}
           />
+
+          <CoursePopupAddTopic
+            show={modalAddTopicShow}
+            topicTitle={topicTitle}
+            topicContent={topicContent}
+            setTopicTitle={setTopicTitle}
+            setTopicContent={setTopicContent}
+            selectedTitle={selectedTitle}
+            addTopic={addTopic}
+            onHide={() => {
+              setModalAddTopicShow(false);
+            }}
+          />
+
           <CoursePopupAddCourse
             show={modalAddCourseShow}
             courseTitle={courseTitle}

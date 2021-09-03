@@ -11,17 +11,12 @@ const CoursePopupAddTopic = (props) => {
     topicContent,
     setTopicTitle,
     setTopicContent,
+    selectedTitle,
+    addTopic,
   } = props;
-
-  const courseID = localStorage.getItem("courseID");
 
   const storage = firebase.storage();
   const storageRef = storage.ref();
-  const ref = firebase
-    .firestore()
-    .collection("courses")
-    .doc(courseID)
-    .collection("topics");
 
   let counter = 1;
   let imageIDlist = [];
@@ -135,7 +130,7 @@ const CoursePopupAddTopic = (props) => {
 
       for (let i = 1; i <= imageIDlist.length; i++) {
         let imageRef =
-          "courses/" + courseID + "/" + topicID + "/image" + i + ".png";
+          "courses/" + selectedTitle + "/" + topicID + "/image" + i + ".png";
         topic["image" + i] = imageRef;
 
         const fileRef = storageRef.child(imageRef);
@@ -144,14 +139,7 @@ const CoursePopupAddTopic = (props) => {
         );
       }
 
-      ref
-        .doc(topicID)
-        .set(topic)
-        .then(() => {
-          onHide();
-          setTopicContent("");
-          setTopicTitle("");
-        });
+      addTopic(topicID, topic);
     }
   };
 

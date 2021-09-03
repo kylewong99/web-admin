@@ -4,12 +4,16 @@ import { Button } from "react-bootstrap";
 import "./User.css";
 import axios from "axios";
 import firebase from "firebase/app";
+import ReactPaginate from "react-paginate";
 import UserPopupAddUser from "./UserPopupAddUser";
+import UserPopupDeleteUser from "./UserPopupDeleteUser";
 
 const User = () => {
   const [users, setUsers] = useState([]);
   const [modalAddUserShow, setModalAddUserShow] = useState();
+  const [modalDeleteUserShow, setModalDeleteUserShow] = useState();
 
+  const [userID, setUserID] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +23,19 @@ const User = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+  const [pageNumber, setPageNumber] = useState(0);
+
+  const usersPerPage = 10;
+  const pageVisited = pageNumber * usersPerPage;
+
+  const pageCount = Math.ceil(users.length / usersPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
   const ref = firebase.firestore().collection("users");
+
+  let counter = 0;
 
   const clearErrors = () => {
     setUsernameError("");
@@ -29,10 +45,21 @@ const User = () => {
   };
 
   const clearInputs = () => {
+    setUserID("");
     setUsername("");
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+  };
+
+  const getUsers = () => {
+    ref.onSnapshot((querySnapShot) => {
+      const users = [];
+      querySnapShot.forEach((user) => {
+        users.push(user.data());
+      });
+      setUsers(users);
+    });
   };
 
   const addUser = () => {
@@ -40,6 +67,16 @@ const User = () => {
     clearErrors();
     if (username.trim().length > 0) {
       if (confirmPassword.length === password.length) {
+        var options = {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        };
+        var today = new Date();
+
+        let date = today.toLocaleDateString("en-US", options);
+
         axios
           .get("/addUser", {
             params: {
@@ -56,6 +93,7 @@ const User = () => {
                   id: userID,
                   email: email,
                   username: username,
+                  createdDate: date,
                 })
                 .catch((err) => {
                   console.log(err);
@@ -87,9 +125,45 @@ const User = () => {
     }
   };
 
+  const deleteUser = () => {
+    clearInputs();
+    axios
+      .get("/deleteUser", {
+        params: {
+          email: email,
+        },
+      })
+      .then(function (response) {
+        ref
+          .doc(userID)
+          .delete()
+          .catch((err) => {
+            console.error(err);
+          });
+        if (users.slice(pageVisited, pageVisited + usersPerPage).length <= 1) {
+          setPageNumber((previousPage) => previousPage - 1);
+        }
+      });
+    setModalDeleteUserShow(false);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, [users]);
+
   return (
     <div>
       <>
+        <UserPopupDeleteUser
+          show={modalDeleteUserShow}
+          onHide={() => {
+            clearInputs();
+            setModalDeleteUserShow(false);
+          }}
+          deleteUser={() => deleteUser()}
+          email={email}
+        />
+
         <UserPopupAddUser
           show={modalAddUserShow}
           onHide={() => {
@@ -130,6 +204,58 @@ const User = () => {
             </div>
           </div>
         </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Email</th>
+              <th scope="col">Username</th>
+              <th scope="col">Created Date</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {users
+              .slice(pageVisited, pageVisited + usersPerPage)
+              .map((user) => {
+                counter += 1;
+                return (
+                  <>
+                    <tr key={user.id}>
+                      <td>{counter}</td>
+                      <td>{user.email}</td>
+                      <td>{user.username}</td>
+                      <td>{user.createdDate}</td>
+                      <td align="right">
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            setEmail(user.email);
+                            setUserID(user.id);
+                            setModalDeleteUserShow(true);
+                          }}
+                        >
+                          X
+                        </Button>
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+          </tbody>
+        </table>
+        <ReactPaginate
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          pageCount={pageCount}
+          onPageChange={changePage}
+          forcePage={pageNumber}
+          containerClassName={"paginationBttns"}
+          previousLinkClassName={"previousBttn"}
+          nextLinkClassName={"nextBttn"}
+          disabledClassName={"paginationDisabled"}
+          activeClassName={"paginationActive"}
+        />
       </>
     </div>
   );

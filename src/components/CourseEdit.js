@@ -155,7 +155,7 @@ const CourseEdit = (props) => {
                 </tr>
                 <tr key={topic.id}>
                   <th>Content</th>
-                  <td>
+                  <td style={{ wordBreak: "break-word" }}>
                     {topic.content != undefined &&
                       topic.content
                         .replaceAll(/ /g, "\u00a0")

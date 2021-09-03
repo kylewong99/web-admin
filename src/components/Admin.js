@@ -117,7 +117,6 @@ const Admin = () => {
           setPageNumber((previousPage) => previousPage - 1);
         }
       });
-
     setModalDeleteShow(false);
   };
 
