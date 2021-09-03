@@ -122,7 +122,7 @@ const Admin = () => {
 
   useEffect(() => {
     getAdmin();
-  });
+  }, [admins]);
 
   return (
     <>
