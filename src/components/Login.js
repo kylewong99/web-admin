@@ -1,5 +1,6 @@
 import React from "react";
 import "./Login.css";
+import logo from "../GoGreenLogo.png"
 
 const Login = (props) => {
   const {
@@ -18,7 +19,7 @@ const Login = (props) => {
         <div class="col-12 my-auto">
           <div class="card w-50 mx-auto">
             <img
-              src="https://seeklogo.com/images/C/cute-dog-logo-9A80384024-seeklogo.com.png"
+              src={logo}
               width="250"
               height="250"
               class="img-center"
