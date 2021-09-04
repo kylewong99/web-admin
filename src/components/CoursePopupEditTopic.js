@@ -125,7 +125,7 @@ const CoursePopupEditTopic = (props) => {
 
   const checkYoutubeURL = () => {
     if (youtubeURL.trim().length > 0) {
-      if (getVideoId(youtubeURL).id != null) {
+      if (getVideoId(youtubeURL).id != null && youtubeURL.includes("youtu")) {
         return false;
       } else {
         document.getElementById("youtubeErrorMessage").innerHTML =
