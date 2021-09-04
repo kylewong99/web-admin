@@ -15,6 +15,7 @@ const CourseEdit = (props) => {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [youtubeURL, setYoutubeURL] = useState("");
 
   const courseID = localStorage.getItem("courseID");
   const topicTitle = localStorage.getItem("topicTitle");
@@ -83,6 +84,8 @@ const CourseEdit = (props) => {
         show={modalEditTopicShow}
         title={title}
         content={content}
+        youtubeURL={youtubeURL}
+        setYoutubeURL={setYoutubeURL}
         setTitle={setTitle}
         setContent={setContent}
         onHide={() => {
@@ -124,6 +127,9 @@ const CourseEdit = (props) => {
                   setModalEditTopicShow(true);
                   setTitle(topics[0].title);
                   setContent(topics[0].content);
+                  if (topics[0].youtubeURL != undefined) {
+                    setYoutubeURL(topics[0].youtubeURL);
+                  }
                 }}
               >
                 Edit Topic
@@ -170,6 +176,14 @@ const CourseEdit = (props) => {
                         })}
                   </td>
                 </tr>
+                {topic.youtubeURL != undefined && (
+                  <tr>
+                    <th>Youtube URL</th>
+                    <td>
+                      <a href={topic.youtubeURL}>{topic.youtubeURL}</a>
+                    </td>
+                  </tr>
+                )}
                 {imageURL.length > 0 &&
                   imageURL.map((image) => {
                     counter += 1;

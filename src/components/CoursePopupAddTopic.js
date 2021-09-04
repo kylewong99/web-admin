@@ -2,12 +2,15 @@ import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import firebase from "firebase/app";
 import { v4 as uuidv4 } from "uuid";
+import getVideoId from "get-video-id";
 
 const CoursePopupAddTopic = (props) => {
   const {
     show,
     onHide,
     topicTitle,
+    youtubeURL,
+    setYoutubeURL,
     topicContent,
     setTopicTitle,
     setTopicContent,
@@ -104,22 +107,40 @@ const CoursePopupAddTopic = (props) => {
         0
       ) {
         console.log("empty");
+        document.getElementById("errorMessage").innerHTML =
+          "Please make sure there are no empty fields.";
         return true;
       }
     }
     return false;
   };
 
+  const checkYoutubeURL = () => {
+    if (youtubeURL.trim().length > 0) {
+      if (getVideoId(youtubeURL).id != null) {
+        return false;
+      } else {
+        document.getElementById("youtubeErrorMessage").innerHTML =
+          "Please provide an valid youtube URL.";
+
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
   const isEmpty = async () => {
     if (
       topicTitle.trim().length === 0 ||
       topicContent.trim().length === 0 ||
-      checkImageEmpty()
+      checkImageEmpty() ||
+      checkYoutubeURL()
     ) {
-      document.getElementById("errorMessage").innerHTML =
-        "Please make sure there are no empty fields.";
+      console.log("Topic Edit unsuccessful.");
     } else {
       document.getElementById("errorMessage").innerHTML = "";
+      document.getElementById("youtubeErrorMessage").innerHTML = "";
       let topicID = uuidv4();
       let topic = {
         id: topicID,
@@ -127,6 +148,13 @@ const CoursePopupAddTopic = (props) => {
         noImage: imageIDlist.length,
         content: topicContent,
       };
+
+      if (youtubeURL.trim().length > 0) {
+        let videoID = getVideoId(youtubeURL).id;
+        let convertedYoutubeURL = "https://www.youtube.com/embed/" + videoID;
+
+        topic["youtubeURL"] = convertedYoutubeURL;
+      }
 
       for (let i = 1; i <= imageIDlist.length; i++) {
         let imageRef =
@@ -196,6 +224,26 @@ const CoursePopupAddTopic = (props) => {
                       ></textarea>
                     </div>
                   </div>
+                </div>
+                <div class="form-group row mb-3">
+                  <label class="col-sm-3 col-form-label">
+                    <b>Youtube URL: </b>
+                  </label>
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value={youtubeURL}
+                      onChange={(e) => setYoutubeURL(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div class="form-group row mt-3">
+                  <div
+                    id="youtubeErrorMessage"
+                    style={{ color: "red" }}
+                    class="col-sm-12"
+                  />
                 </div>
               </div>
               <div class="form-group row mt-4">

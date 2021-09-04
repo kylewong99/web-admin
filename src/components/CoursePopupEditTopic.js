@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import firebase from "firebase/app";
+import getVideoId from "get-video-id";
 
 const CoursePopupEditTopic = (props) => {
   const {
@@ -9,7 +10,9 @@ const CoursePopupEditTopic = (props) => {
     title,
     content,
     setTitle,
-    setContent
+    setContent,
+    youtubeURL,
+    setYoutubeURL,
   } = props;
 
   const topicID = localStorage.getItem("topicID");
@@ -17,7 +20,6 @@ const CoursePopupEditTopic = (props) => {
   const imageURL = JSON.parse(localStorage.getItem("imageURL"));
 
   const storage = firebase.storage();
-
 
   const storageRef = storage.ref();
   const ref = firebase
@@ -29,7 +31,6 @@ const CoursePopupEditTopic = (props) => {
 
   let counter = 1;
   let imageIDlist = [];
-  
 
   const addImage = () => {
     let noImage = counter;
@@ -114,28 +115,53 @@ const CoursePopupEditTopic = (props) => {
         0
       ) {
         console.log("empty");
+        document.getElementById("errorMessage").innerHTML =
+          "Please make sure there are no empty fields.";
         return true;
       }
     }
     return false;
   };
 
+  const checkYoutubeURL = () => {
+    if (youtubeURL.trim().length > 0) {
+      if (getVideoId(youtubeURL).id != null) {
+        return false;
+      } else {
+        document.getElementById("youtubeErrorMessage").innerHTML =
+          "Please provide an valid youtube URL.";
+
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
   const isEmpty = async () => {
     if (
       title.trim().length === 0 ||
       content.trim().length === 0 ||
-      checkImageEmpty()
+      checkImageEmpty() ||
+      checkYoutubeURL()
     ) {
-      document.getElementById("errorMessage").innerHTML =
-        "Please make sure there are no empty fields.";
+      console.log("Topic Edit unsuccessful.");
     } else {
       document.getElementById("errorMessage").innerHTML = "";
+      document.getElementById("youtubeErrorMessage").innerHTML = "";
       let topic = {
         id: topicID,
         title: title,
         noImage: imageIDlist.length,
         content: content,
       };
+
+      if (youtubeURL.trim().length > 0) {
+        let videoID = getVideoId(youtubeURL).id;
+        let convertedYoutubeURL = "https://www.youtube.com/embed/" + videoID;
+
+        topic["youtubeURL"] = convertedYoutubeURL;
+      }
 
       for (let i = 1; i <= imageIDlist.length; i++) {
         let imageRef =
@@ -155,6 +181,9 @@ const CoursePopupEditTopic = (props) => {
 
       ref.set(topic).then(() => {
         onHide();
+        setTitle("");
+        setContent("");
+        setYoutubeURL("");
       });
     }
   };
@@ -199,7 +228,7 @@ const CoursePopupEditTopic = (props) => {
                         id="content"
                         rows="10"
                         class="form-control"
-                        style={{whiteSpace: "pre-wrap"}}
+                        style={{ whiteSpace: "pre-wrap" }}
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={(e) => {
@@ -213,70 +242,93 @@ const CoursePopupEditTopic = (props) => {
                     </div>
                   </div>
                 </div>
-                {imageURL != null && imageURL.map((image) => {
-                  let noImage = counter;
-                  imageIDlist.push(noImage);
-                  let inputIDname = "inputImage" + noImage;
-                  let imageIDname = "image" + noImage;
-                  let imageContainerID = "imageContainer" + noImage;
-                  let imageLabel = "imageLabel" + noImage;
-                  counter += 1;
-                  return (
-                    <>
-                      <div id={imageContainerID}>
-                        <div class="form-group row mb-3">
-                          <label class="col-sm-3 col-form-label">
-                            <b id={imageLabel}>
-                              Image{imageIDlist.indexOf(noImage) + 1} :
-                            </b>
-                          </label>
-                          <div class="col-sm-9">
-                            <img
-                              id={imageIDname}
-                              width="200"
-                              height="200"
-                              src={image}
-                            />
+                <div class="form-group row mb-3">
+                  <label class="col-sm-3 col-form-label">
+                    <b>Youtube URL: </b>
+                  </label>
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value={youtubeURL}
+                      onChange={(e) => setYoutubeURL(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div class="form-group row mt-3">
+                  <div
+                    id="youtubeErrorMessage"
+                    style={{ color: "red" }}
+                    class="col-sm-12"
+                  />
+                </div>
+                {imageURL != null &&
+                  imageURL.map((image) => {
+                    let noImage = counter;
+                    imageIDlist.push(noImage);
+                    let inputIDname = "inputImage" + noImage;
+                    let imageIDname = "image" + noImage;
+                    let imageContainerID = "imageContainer" + noImage;
+                    let imageLabel = "imageLabel" + noImage;
+                    counter += 1;
+                    return (
+                      <>
+                        <div id={imageContainerID}>
+                          <div class="form-group row mb-3">
+                            <label class="col-sm-3 col-form-label">
+                              <b id={imageLabel}>
+                                Image{imageIDlist.indexOf(noImage) + 1} :
+                              </b>
+                            </label>
+                            <div class="col-sm-9">
+                              <img
+                                id={imageIDname}
+                                width="200"
+                                height="200"
+                                src={image}
+                              />
+                            </div>
+                          </div>
+                          <div class="form-group row mb-3">
+                            <label class="col-sm-3 col-form-label" />
+                            <div class="col-sm-9">
+                              <input
+                                id={inputIDname}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  document.getElementById(imageIDname).src =
+                                    window.URL.createObjectURL(
+                                      e.target.files[0]
+                                    );
+                                }}
+                              />
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => {
+                                  imageIDlist.splice(
+                                    imageIDlist.indexOf(noImage),
+                                    1
+                                  );
+                                  imageIDlist.forEach((id) => {
+                                    document.getElementById(
+                                      "imageLabel" + id
+                                    ).innerHTML =
+                                      "Image" + (imageIDlist.indexOf(id) + 1);
+                                  });
+                                  document
+                                    .getElementById(imageContainerID)
+                                    .remove();
+                                }}
+                              >
+                                Delete Image
+                              </button>
+                            </div>
                           </div>
                         </div>
-                        <div class="form-group row mb-3">
-                          <label class="col-sm-3 col-form-label" />
-                          <div class="col-sm-9">
-                            <input
-                              id={inputIDname}
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                document.getElementById(imageIDname).src =
-                                  window.URL.createObjectURL(e.target.files[0]);
-                              }}
-                            />
-                            <button
-                              className="btn btn-danger btn-sm"
-                              onClick={() => {
-                                imageIDlist.splice(
-                                  imageIDlist.indexOf(noImage),
-                                  1
-                                );
-                                imageIDlist.forEach((id) => {
-                                  document.getElementById(
-                                    "imageLabel" + id
-                                  ).innerHTML =
-                                    "Image" + (imageIDlist.indexOf(id) + 1);
-                                });
-                                document
-                                  .getElementById(imageContainerID)
-                                  .remove();
-                              }}
-                            >
-                              Delete Image
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })}
+                      </>
+                    );
+                  })}
               </div>
               <div class="form-group row mt-4">
                 <label class="col-sm-3 col-form-label" />

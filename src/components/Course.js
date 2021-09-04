@@ -39,6 +39,7 @@ const Course = () => {
   //Use in Add Topic Page
   const [topicTitle, setTopicTitle] = useState("");
   const [topicContent, setTopicContent] = useState("");
+  const [youtubeURL, setYoutubeURL] = useState("");
 
   const coursesPerPage = 10;
   const pageVisited = pageNumber * coursesPerPage;
@@ -55,6 +56,7 @@ const Course = () => {
     setCourseTitle("");
     setTopicContent("");
     setTopicTitle("");
+    setYoutubeURL("");
     setImage(null);
   };
 
@@ -226,6 +228,8 @@ const Course = () => {
 
           <CoursePopupAddTopic
             show={modalAddTopicShow}
+            youtubeURL={youtubeURL}
+            setYoutubeURL={setYoutubeURL}
             topicTitle={topicTitle}
             topicContent={topicContent}
             setTopicTitle={setTopicTitle}
