@@ -19,7 +19,7 @@ const Login = (props) => {
         <div class="col-12 my-auto">
           <div class="card w-50 mx-auto">
             <img
-              src={logo}
+              src={"static/media/GoGreenLogo.59937424.png"}
               width="250"
               height="250"
               class="img-center"
