@@ -5,7 +5,7 @@ const React = require("react");
 const ReactDOMServer = require("react-dom/server");
 import App from "../src/App";
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const app = express();
 const router = express.Router();
 
