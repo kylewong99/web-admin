@@ -9,10 +9,14 @@ body {
 }
 
 html, #root, .App {
-  height:100%;
+  margin:0;
+  padding:0;
+  max-height:100vh;
+  overflow:auto;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+

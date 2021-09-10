@@ -17,7 +17,7 @@ const Index = (props) => {
   return (
     <>
       <div class="container-fluid">
-        <div class="row flex-nowrap">
+        <div class="row h-100 flex-nowrap">
           <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
             <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
               <div class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
@@ -30,55 +30,68 @@ const Index = (props) => {
                 id="menu"
               >
                 <li class="nav-item">
-                  <div id="sidebar-content" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-house"></i>{" "}
-                    <span
-                      onClick={() => setPage("admin")}
-                      class="ms-1 d-none d-sm-inline"
-                    >
-                      Admin
-                    </span>
+                  <div
+                    onClick={() => setPage("admin")}
+                    id="sidebar-content"
+                    class="nav-link align-middle px-0"
+                  >
+                    <i
+                      style={{ fontSize: "1.5rem", marginRight: "10px" }}
+                      class="bi bi-person-badge"
+                    ></i>
+                    <span class="ms-1 d-none d-sm-inline">Admin</span>
                   </div>
                 </li>
                 <li class="nav-item">
-                  <div id="sidebar-content" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-house"></i>{" "}
-                    <span
-                      onClick={() => setPage("user")}
-                      class="ms-1 d-none d-sm-inline"
-                    >
-                      User
-                    </span>
+                  <div
+                    onClick={() => setPage("user")}
+                    id="sidebar-content"
+                    class="nav-link align-middle px-0"
+                  >
+                    <i
+                      style={{ fontSize: "1.5rem", marginRight: "11px" }}
+                      class="bi bi-people-fill"
+                    ></i>
+                    <span class="ms-1 d-none d-sm-inline">User</span>
                   </div>
                 </li>
                 <li class="nav-item">
-                  <div id="sidebar-content" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-house"></i>{" "}
-                    <span onClick={() => setPage("course")} class="ms-1 d-none d-sm-inline">
-                      Courses
-                    </span>
+                  <div
+                    onClick={() => setPage("course")}
+                    id="sidebar-content"
+                    class="nav-link align-middle px-0"
+                  >
+                    <i
+                      style={{ fontSize: "1.3rem", marginRight: "10px" }}
+                      class="fas fa-chalkboard-teacher"
+                    ></i>
+                    <span class="ms-1 d-none d-sm-inline">Courses</span>
                   </div>
                 </li>
                 <li class="nav-item">
-                  <div id="sidebar-content" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-house"></i>{" "}
-                    <span
-                      onClick={() => setPage("quiz")}
-                      class="ms-1 d-none d-sm-inline"
-                    >
-                      Quizes
-                    </span>
+                  <div
+                    onClick={() => setPage("quiz")}
+                    id="sidebar-content"
+                    class="nav-link align-middle px-0"
+                  >
+                    <i
+                      style={{ fontSize: "1.5rem", marginRight: "10px" }}
+                      class="fas fa-puzzle-piece"
+                    ></i>
+                    <span class="ms-1 d-none d-sm-inline">Quizes</span>
                   </div>
                 </li>
                 <li class="nav-item">
-                  <div id="sidebar-content" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-house"></i>{" "}
-                    <span
-                      onClick={handleLogout}
-                      class="ms-1 d-none d-sm-inline"
-                    >
-                      Logout
-                    </span>
+                  <div
+                    onClick={handleLogout}
+                    id="sidebar-content"
+                    class="nav-link align-middle px-0"
+                  >
+                    <i
+                      style={{ fontSize: "1.5rem", marginRight: "12px" }}
+                      class="bi bi-box-arrow-right"
+                    ></i>
+                    <span class="ms-1 d-none d-sm-inline">Logout</span>
                   </div>
                 </li>
               </ul>
@@ -102,7 +115,7 @@ const Index = (props) => {
                 case "quiz":
                   return <Quiz />;
                 case "course":
-                  return <Course />
+                  return <Course />;
                 default:
                   return <Admin />;
               }
