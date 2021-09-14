@@ -4,6 +4,7 @@ import "firebase/storage";
 import firebase from "firebase/app";
 import CoursePopupDeleteTopic from "./CoursePopupDeleteTopic";
 import CoursePopupEditTopic from "./CoursePopupEditTopic";
+import LoadingPopup from "./LoadingPopup";
 
 const CourseEdit = (props) => {
   const { setCourseEdit } = props;
@@ -12,6 +13,7 @@ const CourseEdit = (props) => {
   const [imageURL, setImageURL] = useState([]);
   const [modalDeleteTopicShow, setModalDeleteTopicShow] = useState();
   const [modalEditTopicShow, setModalEditTopicShow] = useState();
+  const [modalLoadingShow, setModalLoadingShow] = useState();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -59,6 +61,7 @@ const CourseEdit = (props) => {
   const getImage = async (topics) => {
     const imageList = [];
     if (topics != undefined) {
+      setModalLoadingShow(true);
       for (let i = 1; i <= topics.noImage; i++) {
         console.log("how");
         const imageURL = await storage
@@ -67,6 +70,7 @@ const CourseEdit = (props) => {
           .getDownloadURL();
         imageList.push(imageURL);
       }
+      setModalLoadingShow(false);
     }
 
     return new Promise((resolve, reject) => {
@@ -80,6 +84,8 @@ const CourseEdit = (props) => {
 
   return (
     <>
+      <LoadingPopup show={modalLoadingShow} />
+
       <CoursePopupEditTopic
         show={modalEditTopicShow}
         title={title}

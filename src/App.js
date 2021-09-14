@@ -83,9 +83,9 @@ function App() {
   };
 
   const handleLogout = () => {
+    console.log("logout");
     firebase.auth().signOut();
     clearInputs();
-    console.log("Logoutss");
   };
 
   const authListener = () => {
@@ -105,7 +105,7 @@ function App() {
   return (
     <>
       {user ? (
-        <Index email={email} handleLogout={handleLogout} />
+        <Index handleLogout={handleLogout} />
       ) : (
         <Login
           email={email}

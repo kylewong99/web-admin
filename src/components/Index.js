@@ -4,11 +4,16 @@ import Admin from "./Admin";
 import User from "./User";
 import Quiz from "./Quiz";
 import Course from "./Course";
+import firebase from "firebase/app";
+import "firebase/auth";
+
 
 const Index = (props) => {
   const [selectedPage, setSelectedPage] = useState("admin");
 
-  const { email, handleLogout } = props;
+  const { handleLogout } = props;
+
+  const email = firebase.auth().currentUser.email;
 
   const setPage = (page) => {
     setSelectedPage(page);

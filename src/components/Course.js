@@ -369,17 +369,7 @@ const Course = () => {
                         <td>{course.title}</td>
                         <td align="right">
                           <Button
-                            variant="danger"
-                            onClick={() => {
-                              setModalDeleteTopicShow(true);
-                              localStorage.setItem("topicID", course.id);
-                            }}
-                          >
-                            X
-                          </Button>
-                          <Button
                             variant="primary"
-                            className="ms-2"
                             onClick={() => {
                               localStorage.setItem("topicID", course.id);
                               localStorage.setItem("topicTitle", course.title);
@@ -387,6 +377,16 @@ const Course = () => {
                             }}
                           >
                             Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            className="ms-2"
+                            onClick={() => {
+                              setModalDeleteTopicShow(true);
+                              localStorage.setItem("topicID", course.id);
+                            }}
+                          >
+                            X
                           </Button>
                         </td>
                       </tr>
