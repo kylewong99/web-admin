@@ -151,7 +151,7 @@ const Admin = () => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item active" aria-current="page">
-                Admin
+                Admins
               </li>
             </ol>
           </nav>

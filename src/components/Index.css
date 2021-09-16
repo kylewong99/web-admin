@@ -7,3 +7,8 @@
     cursor: pointer;
 }
 
+#logout:hover i, #logout:hover span {
+    cursor: pointer;
+    color:black;
+    opacity: 0.8;
+}

@@ -66,7 +66,7 @@ const UserViewProgress = (props) => {
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
               <a onClick={() => setUserViewProgress(false)} href="#">
-                User
+                Users
               </a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">
@@ -76,7 +76,7 @@ const UserViewProgress = (props) => {
         </nav>
         {userProgress.length === 0 ? (
           <>
-            <h1>The user haven't took any quiz.</h1>
+            <h3>This user haven't took any quiz.</h3>
           </>
         ) : (
           <>
