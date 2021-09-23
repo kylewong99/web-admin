@@ -94,7 +94,7 @@ const CoursePopupEditCourse = (props) => {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => isEmpty()}>Add</Button>
+            <Button onClick={() => isEmpty()}>Save</Button>
             <Button variant="danger" onClick={onHide}>
               Close
             </Button>

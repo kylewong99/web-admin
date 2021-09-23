@@ -200,6 +200,7 @@ const Quiz = () => {
       await setSelectedTitle("");
     } else {
       await setSelectedTitle(quizzesList[0].id);
+      localStorage.setItem("quizTitle", quizzesList[0].title);
       localStorage.setItem("quizID", quizzesList[0].id);
     }
   };

@@ -118,11 +118,11 @@ const CoursePopupAddTopic = (props) => {
   const checkYoutubeURL = () => {
     if (youtubeURL.trim().length > 0) {
       if (getVideoId(youtubeURL).id != null && youtubeURL.includes("youtu")) {
+        document.getElementById("youtubeErrorMessage").innerHTML = "";
         return false;
       } else {
         document.getElementById("youtubeErrorMessage").innerHTML =
           "Please provide an valid youtube URL.";
-
         return true;
       }
     } else {
@@ -132,12 +132,19 @@ const CoursePopupAddTopic = (props) => {
 
   const isEmpty = async () => {
     if (
+      checkYoutubeURL() ||
       topicTitle.trim().length === 0 ||
       topicContent.trim().length === 0 ||
-      checkImageEmpty() ||
-      checkYoutubeURL()
+      checkImageEmpty()
     ) {
       console.log("Topic Edit unsuccessful.");
+
+      if (topicTitle.trim().length > 0 && topicContent.trim().length > 0) {
+        document.getElementById("errorMessage").innerHTML = "";
+      } else {
+        document.getElementById("errorMessage").innerHTML =
+          "Please make sure Topic title and Content was filled";
+      }
     } else {
       document.getElementById("errorMessage").innerHTML = "";
       document.getElementById("youtubeErrorMessage").innerHTML = "";
@@ -268,7 +275,7 @@ const CoursePopupAddTopic = (props) => {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => isEmpty()}>Add</Button>
+            <Button onClick={() => isEmpty()}>Save</Button>
             <Button variant="danger" onClick={onHide}>
               Close
             </Button>

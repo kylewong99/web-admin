@@ -163,7 +163,7 @@ const QuizPopupAddQuestion = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={() => isEmpty()}>
-            Add
+            Save
           </Button>
           <Button variant="danger" onClick={onHide}>Close</Button>
         </Modal.Footer>

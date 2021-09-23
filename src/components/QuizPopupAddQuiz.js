@@ -16,9 +16,9 @@ const QuizPopupAddQuiz = (props) => {
 
   const isEmpty = () => {
     if (quizTitle.trim().length === 0 || image === null) {
-        setErrorMessage("Please make sure there are no empty fields.");
+      setErrorMessage("Please make sure there are no empty fields.");
     } else {
-        addQuiz(quizTitle);
+      addQuiz(quizTitle);
     }
   };
 
@@ -56,10 +56,21 @@ const QuizPopupAddQuiz = (props) => {
                   <b>Quiz Cover Page Image:</b>
                 </label>
                 <div class="col-sm-9">
+                  <img id="image" width="200" height="200" />
+                </div>
+              </div>
+              <div class="form-group row mb-3">
+                <label class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
                   <input
+                    id="inputImage"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={(e) => {
+                      setImage(e.target.files[0]);
+                      document.getElementById("image").src =
+                        window.URL.createObjectURL(e.target.files[0]);
+                    }}
                   />
                 </div>
               </div>
@@ -73,7 +84,7 @@ const QuizPopupAddQuiz = (props) => {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => isEmpty()}>Add</Button>
+            <Button onClick={() => isEmpty()}>Save</Button>
             <Button variant="danger" onClick={onHide}>
               Close
             </Button>

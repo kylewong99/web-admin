@@ -129,6 +129,7 @@ const Course = () => {
       await setSelectedTitle("");
     } else {
       await setSelectedTitle(title[0].id);
+      localStorage.setItem("courseTitle", title[0].title);
       localStorage.setItem("courseID", title[0].id);
     }
   };
@@ -238,6 +239,7 @@ const Course = () => {
             addTopic={addTopic}
             onHide={() => {
               setModalAddTopicShow(false);
+              clearInputs();
             }}
           />
 

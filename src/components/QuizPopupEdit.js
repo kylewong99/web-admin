@@ -161,7 +161,7 @@ const QuizPopupEdit = (props) => {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => isEmpty()}>Edit</Button>
+          <Button onClick={() => isEmpty()}>Save</Button>
           <Button variant="danger" onClick={onHide}>
             Close
           </Button>
