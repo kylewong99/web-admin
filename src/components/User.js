@@ -86,6 +86,7 @@ const User = () => {
             params: {
               email: email,
               password: password,
+              username: username,
             },
           })
           .then(function (response) {

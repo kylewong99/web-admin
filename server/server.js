@@ -47,12 +47,14 @@ app.listen(PORT, () => {
 app.get("/addUser", function (req, res) {
   let email = req.query.email;
   let password = req.query.password;
+  let username = req.query.username;
 
   admin
     .auth()
     .createUser({
       email: email,
       password: password,
+      displayName: username,
     })
     .then((userRecord) => {
       // See the UserRecord reference doc for the contents of userRecord.
