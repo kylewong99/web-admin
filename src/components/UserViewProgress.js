@@ -107,51 +107,57 @@ const UserViewProgress = (props) => {
 
         <LoadingPopup show={modalLoadingShow} />
 
-        {userProgress.length === 0 ? (
-          <>{!loading && <h3>This user haven't took any quiz.</h3>}</>
+        {modalLoadingShow === true ? (
+          <></>
         ) : (
           <>
-            <table class="table mt-1">
-              <thead>
-                <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Quiz Title</th>
-                  <th scope="col">No Attempt</th>
-                  <th scope="col">Highest Score</th>
-                  <th scope="col">Latest Attempt</th>
-                </tr>
-              </thead>
-              <tbody>
-                {userProgress
-                  .slice(pageVisited, pageVisited + quizResultsPerPage)
-                  .map((quizDetail) => {
-                    counter += 1;
-                    return (
-                      <>
-                        <tr key={quizDetail.quizID}>
-                          <td>{counter}</td>
-                          <td>{quizDetail.quizTitle}</td>
-                          <td>{quizDetail.noAttempt}</td>
-                          <td>{quizDetail.highestScore} %</td>
-                          <td>{quizDetail.latestAttempt}</td>
-                        </tr>
-                      </>
-                    );
-                  })}
-              </tbody>
-            </table>
-            <ReactPaginate
-              previousLabel={"Previous"}
-              nextLabel={"Next"}
-              pageCount={pageCount}
-              onPageChange={changePage}
-              forcePage={pageNumber}
-              containerClassName={"paginationBttns"}
-              previousLinkClassName={"previousBttn"}
-              nextLinkClassName={"nextBttn"}
-              disabledClassName={"paginationDisabled"}
-              activeClassName={"paginationActive"}
-            />
+            {userProgress.length === 0 ? (
+              <h3>This user haven't took any quiz.</h3>
+            ) : (
+              <>
+                <table class="table mt-1">
+                  <thead>
+                    <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Quiz Title</th>
+                      <th scope="col">No Attempt</th>
+                      <th scope="col">Highest Score</th>
+                      <th scope="col">Latest Attempt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userProgress
+                      .slice(pageVisited, pageVisited + quizResultsPerPage)
+                      .map((quizDetail) => {
+                        counter += 1;
+                        return (
+                          <>
+                            <tr key={quizDetail.quizID}>
+                              <td>{counter}</td>
+                              <td>{quizDetail.quizTitle}</td>
+                              <td>{quizDetail.noAttempt}</td>
+                              <td>{quizDetail.highestScore} %</td>
+                              <td>{quizDetail.latestAttempt}</td>
+                            </tr>
+                          </>
+                        );
+                      })}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  pageCount={pageCount}
+                  onPageChange={changePage}
+                  forcePage={pageNumber}
+                  containerClassName={"paginationBttns"}
+                  previousLinkClassName={"previousBttn"}
+                  nextLinkClassName={"nextBttn"}
+                  disabledClassName={"paginationDisabled"}
+                  activeClassName={"paginationActive"}
+                />
+              </>
+            )}
           </>
         )}
       </>
