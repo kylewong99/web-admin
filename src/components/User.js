@@ -8,12 +8,14 @@ import ReactPaginate from "react-paginate";
 import UserPopupAddUser from "./UserPopupAddUser";
 import UserPopupDeleteUser from "./UserPopupDeleteUser";
 import UserViewProgress from "./UserViewProgress";
+import LoadingPopup from "./LoadingPopup";
 
 const User = () => {
   const [users, setUsers] = useState([]);
   const [modalAddUserShow, setModalAddUserShow] = useState();
   const [modalDeleteUserShow, setModalDeleteUserShow] = useState();
   const [userViewProgress, setUserViewProgress] = useState(false);
+  const [modalLoadingShow, setModalLoadingShow] = useState();
 
   const [userID, setUserID] = useState("");
   const [username, setUsername] = useState("");
@@ -129,6 +131,7 @@ const User = () => {
 
   const deleteUser = () => {
     clearInputs();
+    setModalLoadingShow(true);
     axios
       .get("/deleteUser", {
         params: {
@@ -146,6 +149,7 @@ const User = () => {
           setPageNumber((previousPage) => previousPage - 1);
         }
       });
+    setModalLoadingShow(false);
     setModalDeleteUserShow(false);
   };
 
@@ -157,13 +161,15 @@ const User = () => {
     <div>
       <>
         {userViewProgress ? (
-          <UserViewProgress 
-          setUserViewProgress={setUserViewProgress} 
-          username={username}
-          userID={userID}
+          <UserViewProgress
+            setUserViewProgress={setUserViewProgress}
+            username={username}
+            userID={userID}
           />
         ) : (
           <>
+            <LoadingPopup show={modalLoadingShow} />
+
             <UserPopupDeleteUser
               show={modalDeleteUserShow}
               onHide={() => {

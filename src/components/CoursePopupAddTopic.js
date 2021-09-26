@@ -275,7 +275,7 @@ const CoursePopupAddTopic = (props) => {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => isEmpty()}>Save</Button>
+            <Button onClick={() => isEmpty()}>Add</Button>
             <Button variant="danger" onClick={onHide}>
               Close
             </Button>

@@ -7,11 +7,14 @@ import AdminPopupDelete from "./AdminPopupDelete";
 import firebase from "firebase/app";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import LoadingPopup from "./LoadingPopup";
 
 const Admin = () => {
   const [admins, setAdmins] = useState([]);
   const [modalAddShow, setModalAddShow] = useState();
   const [modalDeleteShow, setModalDeleteShow] = useState();
+  const [modalLoadingShow, setModalLoadingShow] = useState();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -60,7 +63,7 @@ const Admin = () => {
     clearErrors();
     if (confirmPassword.length === password.length) {
       axios
-        .get("/addAdmin", {
+        .get("/addUser", {
           params: {
             email: email,
             password: password,
@@ -98,8 +101,9 @@ const Admin = () => {
   };
 
   const deleteAdmin = (admin) => {
+    setModalLoadingShow(true);
     axios
-      .get("/deleteAdmin", {
+      .get("/deleteUser", {
         params: {
           email: admin.adminEmail,
         },
@@ -117,6 +121,7 @@ const Admin = () => {
           setPageNumber((previousPage) => previousPage - 1);
         }
       });
+    setModalLoadingShow(false);
     setModalDeleteShow(false);
   };
 
@@ -126,6 +131,8 @@ const Admin = () => {
 
   return (
     <>
+      <LoadingPopup show={modalLoadingShow} />
+
       <AdminPopupAdd
         show={modalAddShow}
         onHide={() => setModalAddShow(false)}
