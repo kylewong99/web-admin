@@ -156,7 +156,7 @@ const User = () => {
 
   useEffect(() => {
     getUsers();
-  }, [users]);
+  }, []);
 
   return (
     <div>
