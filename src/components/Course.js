@@ -343,60 +343,65 @@ const Course = () => {
               })}
             </Form.Control>
           </Form.Group>
-          <table class="table mt-1">
-            <thead>
-              <tr>
-                <th scope="col">No</th>
-                <th scope="col">Topic Title</th>
-                <th style={{ textAlign: "right" }} scope="col">
-                  <Button
-                    onClick={() => {
-                      setModalAddTopicShow(true);
-                    }}
-                  >
-                    Add Topic
-                  </Button>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses
-                .slice(pageVisited, pageVisited + coursesPerPage)
-                .map((course) => {
-                  counter += 1;
-                  return (
-                    <>
-                      <tr key={course.id}>
-                        <td>{counter}</td>
-                        <td>{course.title}</td>
-                        <td align="right">
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              localStorage.setItem("topicID", course.id);
-                              localStorage.setItem("topicTitle", course.title);
-                              setCourseEdit("true");
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            className="ms-2"
-                            onClick={() => {
-                              setModalDeleteTopicShow(true);
-                              localStorage.setItem("topicID", course.id);
-                            }}
-                          >
-                            X
-                          </Button>
-                        </td>
-                      </tr>
-                    </>
-                  );
-                })}
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table mt-1">
+              <thead>
+                <tr>
+                  <th scope="col">No</th>
+                  <th scope="col">Topic Title</th>
+                  <th style={{ textAlign: "right" }} scope="col">
+                    <Button
+                      onClick={() => {
+                        setModalAddTopicShow(true);
+                      }}
+                    >
+                      Add Topic
+                    </Button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {courses
+                  .slice(pageVisited, pageVisited + coursesPerPage)
+                  .map((course) => {
+                    counter += 1;
+                    return (
+                      <>
+                        <tr key={course.id}>
+                          <td>{counter}</td>
+                          <td>{course.title}</td>
+                          <td align="right">
+                            <Button
+                              variant="primary"
+                              onClick={() => {
+                                localStorage.setItem("topicID", course.id);
+                                localStorage.setItem(
+                                  "topicTitle",
+                                  course.title
+                                );
+                                setCourseEdit("true");
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="danger"
+                              className="ms-2"
+                              onClick={() => {
+                                setModalDeleteTopicShow(true);
+                                localStorage.setItem("topicID", course.id);
+                              }}
+                            >
+                              X
+                            </Button>
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
           <ReactPaginate
             previousLabel={"Previous"}
             nextLabel={"Next"}

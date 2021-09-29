@@ -224,57 +224,59 @@ const User = () => {
                 </div>
               </div>
             </div>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Username</th>
-                  <th scope="col">Created Date</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {users
-                  .slice(pageVisited, pageVisited + usersPerPage)
-                  .map((user) => {
-                    counter += 1;
-                    return (
-                      <>
-                        <tr key={user.id}>
-                          <td>{counter}</td>
-                          <td>{user.email}</td>
-                          <td>{user.username}</td>
-                          <td>{user.createdDate}</td>
-                          <td align="right">
-                            <Button
-                              variant="primary"
-                              onClick={() => {
-                                setUserViewProgress(true);
-                                setUsername(user.username);
-                                setUserID(user.id);
-                              }}
-                            >
-                              View
-                            </Button>
-                            <Button
-                              variant="danger"
-                              className="ms-2"
-                              onClick={() => {
-                                setEmail(user.email);
-                                setUserID(user.id);
-                                setModalDeleteUserShow(true);
-                              }}
-                            >
-                              X
-                            </Button>
-                          </td>
-                        </tr>
-                      </>
-                    );
-                  })}
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Created Date</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users
+                    .slice(pageVisited, pageVisited + usersPerPage)
+                    .map((user) => {
+                      counter += 1;
+                      return (
+                        <>
+                          <tr key={user.id}>
+                            <td>{counter}</td>
+                            <td>{user.email}</td>
+                            <td>{user.username}</td>
+                            <td>{user.createdDate}</td>
+                            <td align="right">
+                              <Button
+                                variant="primary"
+                                onClick={() => {
+                                  setUserViewProgress(true);
+                                  setUsername(user.username);
+                                  setUserID(user.id);
+                                }}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                variant="danger"
+                                className="ms-2"
+                                onClick={() => {
+                                  setEmail(user.email);
+                                  setUserID(user.id);
+                                  setModalDeleteUserShow(true);
+                                }}
+                              >
+                                X
+                              </Button>
+                            </td>
+                          </tr>
+                        </>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
             <ReactPaginate
               previousLabel={"Previous"}
               nextLabel={"Next"}

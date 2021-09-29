@@ -155,60 +155,61 @@ const CourseEdit = (props) => {
           </div>
         </div>
       </div>
-
-      <table class="table">
-        <tbody>
-          {topics.map((topic) => {
-            return (
-              <>
-                <tr>
-                  <th>Title</th>
-                  <td>{topic.title}</td>
-                </tr>
-                <tr key={topic.id}>
-                  <th>Content</th>
-                  <td style={{ wordBreak: "break-word" }}>
-                    {topic.content != undefined &&
-                      topic.content
-                        .replaceAll(/ /g, "\u00a0")
-                        .split("\n")
-                        .map((item) => {
-                          return (
-                            <>
-                              {item}
-                              <br />
-                            </>
-                          );
-                        })}
-                  </td>
-                </tr>
-                {topic.youtubeURL != undefined && (
+      <div class="table-responsive">
+        <table class="table">
+          <tbody>
+            {topics.map((topic) => {
+              return (
+                <>
                   <tr>
-                    <th>Youtube URL</th>
-                    <td>
-                      <a href={topic.youtubeURL}>{topic.youtubeURL}</a>
+                    <th>Title</th>
+                    <td>{topic.title}</td>
+                  </tr>
+                  <tr key={topic.id}>
+                    <th>Content</th>
+                    <td style={{ wordBreak: "break-word" }}>
+                      {topic.content != undefined &&
+                        topic.content
+                          .replaceAll(/ /g, "\u00a0")
+                          .split("\n")
+                          .map((item) => {
+                            return (
+                              <>
+                                {item}
+                                <br />
+                              </>
+                            );
+                          })}
                     </td>
                   </tr>
-                )}
-                {imageURL.length > 0 &&
-                  imageURL.map((image) => {
-                    counter += 1;
-                    return (
-                      <>
-                        <tr>
-                          <th>Image{counter}</th>
-                          <td>
-                            <img width="200" height="200" src={image} />
-                          </td>
-                        </tr>
-                      </>
-                    );
-                  })}
-              </>
-            );
-          })}
-        </tbody>
-      </table>
+                  {topic.youtubeURL != undefined && (
+                    <tr>
+                      <th>Youtube URL</th>
+                      <td>
+                        <a href={topic.youtubeURL}>{topic.youtubeURL}</a>
+                      </td>
+                    </tr>
+                  )}
+                  {imageURL.length > 0 &&
+                    imageURL.map((image) => {
+                      counter += 1;
+                      return (
+                        <>
+                          <tr>
+                            <th>Image{counter}</th>
+                            <td>
+                              <img width="200" height="200" src={image} />
+                            </td>
+                          </tr>
+                        </>
+                      );
+                    })}
+                </>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };

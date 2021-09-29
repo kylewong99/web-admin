@@ -171,42 +171,44 @@ const Admin = () => {
           </div>
         </div>
       </div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Email</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {admins
-            .slice(pageVisited, pageVisited + adminsPerPage)
-            .map((admin) => {
-              counter += 1;
-              return (
-                <>
-                  <tr key={admin.id}>
-                    <td>{counter}</td>
-                    <td>{admin.email}</td>
-                    <td align="right">
-                      <Button
-                        variant="danger"
-                        onClick={() => {
-                          setModalDeleteShow(true);
-                          localStorage.setItem("deleteEmail", admin.email);
-                          localStorage.setItem("deleteAdminId", admin.id);
-                        }}
-                      >
-                        X
-                      </Button>
-                    </td>
-                  </tr>
-                </>
-              );
-            })}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Email</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {admins
+              .slice(pageVisited, pageVisited + adminsPerPage)
+              .map((admin) => {
+                counter += 1;
+                return (
+                  <>
+                    <tr key={admin.id}>
+                      <td>{counter}</td>
+                      <td>{admin.email}</td>
+                      <td align="right">
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            setModalDeleteShow(true);
+                            localStorage.setItem("deleteEmail", admin.email);
+                            localStorage.setItem("deleteAdminId", admin.id);
+                          }}
+                        >
+                          X
+                        </Button>
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
       <ReactPaginate
         previousLabel={"Previous"}
         nextLabel={"Next"}

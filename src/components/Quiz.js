@@ -408,84 +408,86 @@ const Quiz = () => {
           })}
         </Form.Control>
       </Form.Group>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Questions</th>
-            <th scope="col">Option A</th>
-            <th scope="col">Option B</th>
-            <th scope="col">Option C</th>
-            <th scope="col">Option D</th>
-            <th scope="col">Answer</th>
-            <th style={{ textAlign: "right", width: "11%" }} scope="col">
-              <Button
-                onClick={() => {
-                  setModalAddQuestionShow(true);
-                }}
-              >
-                Add Question
-              </Button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {quizzes
-            .slice(pageVisited, pageVisited + quizzesPerPage)
-            .map((quiz) => {
-              counter += 1;
-              return (
-                <>
-                  <tr key={quiz.id}>
-                    <td>{counter}</td>
-                    <td>{quiz.question}</td>
-                    <td>{quiz.optionA}</td>
-                    <td>{quiz.optionB}</td>
-                    <td>{quiz.optionC}</td>
-                    <td>{quiz.optionD}</td>
-                    <td>{quiz.answer}</td>
-                    <td align="right">
-                      <Button
-                        onClick={() => {
-                          ref
-                            .doc(selectedTitle)
-                            .collection("questions")
-                            .doc(quiz.id)
-                            .get()
-                            .then((quiz) => {
-                              setQuestion(quiz.data().question);
-                              setOptionA(quiz.data().optionA);
-                              setOptionB(quiz.data().optionB);
-                              setOptionC(quiz.data().optionC);
-                              setOptionD(quiz.data().optionD);
-                              setAnswer(quiz.data().answer);
-                            })
-                            .then(() => {
-                              setModalEditShow(true);
-                              localStorage.setItem("docID", quiz.id);
-                            });
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        className="ms-2"
-                        onClick={() => {
-                          setModalDeleteShow(true);
-                          localStorage.setItem("question", quiz.question);
-                          localStorage.setItem("docID", quiz.id);
-                        }}
-                      >
-                        X
-                      </Button>
-                    </td>
-                  </tr>
-                </>
-              );
-            })}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Questions</th>
+              <th scope="col">Option A</th>
+              <th scope="col">Option B</th>
+              <th scope="col">Option C</th>
+              <th scope="col">Option D</th>
+              <th scope="col">Answer</th>
+              <th style={{ textAlign: "right", width: "11%" }} scope="col">
+                <Button
+                  onClick={() => {
+                    setModalAddQuestionShow(true);
+                  }}
+                >
+                  Add Question
+                </Button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {quizzes
+              .slice(pageVisited, pageVisited + quizzesPerPage)
+              .map((quiz) => {
+                counter += 1;
+                return (
+                  <>
+                    <tr key={quiz.id}>
+                      <td>{counter}</td>
+                      <td>{quiz.question}</td>
+                      <td>{quiz.optionA}</td>
+                      <td>{quiz.optionB}</td>
+                      <td>{quiz.optionC}</td>
+                      <td>{quiz.optionD}</td>
+                      <td>{quiz.answer}</td>
+                      <td align="right">
+                        <Button
+                          onClick={() => {
+                            ref
+                              .doc(selectedTitle)
+                              .collection("questions")
+                              .doc(quiz.id)
+                              .get()
+                              .then((quiz) => {
+                                setQuestion(quiz.data().question);
+                                setOptionA(quiz.data().optionA);
+                                setOptionB(quiz.data().optionB);
+                                setOptionC(quiz.data().optionC);
+                                setOptionD(quiz.data().optionD);
+                                setAnswer(quiz.data().answer);
+                              })
+                              .then(() => {
+                                setModalEditShow(true);
+                                localStorage.setItem("docID", quiz.id);
+                              });
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          className="ms-2"
+                          onClick={() => {
+                            setModalDeleteShow(true);
+                            localStorage.setItem("question", quiz.question);
+                            localStorage.setItem("docID", quiz.id);
+                          }}
+                        >
+                          X
+                        </Button>
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
       <ReactPaginate
         previousLabel={"Previous"}
         nextLabel={"Next"}
