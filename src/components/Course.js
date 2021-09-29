@@ -382,7 +382,7 @@ const Course = () => {
                                 setCourseEdit("true");
                               }}
                             >
-                              Edit
+                              View
                             </Button>
                             <Button
                               variant="danger"
