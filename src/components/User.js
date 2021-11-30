@@ -62,6 +62,9 @@ const User = () => {
       querySnapShot.forEach((user) => {
         users.push(user.data());
       });
+      users.sort((a,b) => {
+        return Date.parse(a.createdDate) < Date.parse(b.createdDate);
+      })
       setUsers(users);
     });
   };
